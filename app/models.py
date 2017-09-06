@@ -14,6 +14,8 @@ class User(db.Model):
     username = db.Column(db.String(256), nullable=False, unique=True)
     email = db.Column(db.String(256), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
+    buddy = db.relationship(
+        'Buddy', order_by='Buddi.id', cascade="all, delete-orphan")
     shoppinglist = db.relationship(
         'Shoppinglist', order_by='Shoppinglist.id', cascade="all, delete-orphan")
 
@@ -157,13 +159,13 @@ class Buddy(db.model):
     __tablename__ = 'buddies'
     #define collumns
     id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.String(255))
     friend_id = db.Column(db.Integer())
+    parent = db.Column(db.Integer, db.ForeignKey(User.id))
 
-    def __init__(self, parent_id, friend_id):
+    def __init__(self, friend_id, parent):
         """Initialize buddies."""
-        self.name = name
-        self.owned_by = owned_by
+        self.friend_id = friend_id
+        self.parent = parent
     def save(self):
         """Save a buddies"""
         db.session.add(self)
@@ -172,7 +174,7 @@ class Buddy(db.model):
     @staticmethod
     def get_all(user_id):
         """gets all the items for a given Shoppinglist."""
-        return Shoppinglist.query.filter_by(parent_id=user_id)
+        return Shoppinglist.query.filter_by(parent=user_id)
 
     def delete(self):
         """Deletes a passed buddy."""
