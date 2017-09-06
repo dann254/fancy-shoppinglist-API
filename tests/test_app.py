@@ -13,7 +13,7 @@ class AuthTest(unittest.TestCase):
         self.client = self.app.test_client
         # user test json with predifined variables
         self.user_data = {
-            'username': 'user@mail.com',
+            'username': 'thisuser',
             'password': 'mypassword'
         }
         #initialize endpoints
