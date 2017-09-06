@@ -13,10 +13,10 @@ def create_app(config_name):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
 
-    # import the blueprints and register them on the app
-    #from app.views import auth_bp, shoppinglist_bp
-    #app.register_blueprint(auth_bp)
-    #app.register_blueprint(shoppinglist_bp)
+    #import the blueprints and register them on the app
+    from app.views import auth_bp, shoppinglist_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(shoppinglist_bp)
 
 
     return app

@@ -12,21 +12,19 @@ class User(db.Model):
     # table collumns
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(256), nullable=False, unique=True)
-    email = db.Column(db.String(256), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
     buddy = db.relationship(
-        'Buddy', order_by='Buddi.id', cascade="all, delete-orphan")
+        'Buddy', order_by='Buddy.id', cascade="all, delete-orphan")
     shoppinglist = db.relationship(
         'Shoppinglist', order_by='Shoppinglist.id', cascade="all, delete-orphan")
 
-    def __init__(self, email, username, password):
-        """Initialize user's username, email and password."""
-        self.email = email
+    def __init__(self, username, password):
+        """Initialize user's username and password."""
         self.username = username
         #encrypt password using Bcrypt
         self.password = Bcrypt().generate_password_hash(password).decode()
 
-    def password_is_valid(self, password):
+    def validate_password(self, password):
         """validates user password using Bcrypt"""
         return Bcrypt().check_password_hash(self.password, password)
 
@@ -87,7 +85,7 @@ class Shoppinglist(db.Model):
         onupdate=db.func.current_timestamp())
     owned_by = db.Column(db.Integer, db.ForeignKey(User.id))
     items = db.relationship(
-        'Items', order_by='Item.id', cascade="all, delete-orphan")
+        'Item', order_by='Item.id', cascade="all, delete-orphan")
 
     def __init__(self, name, shared, zone, owned_by):
         """Initialize the shoppinglist."""
@@ -116,7 +114,7 @@ class Shoppinglist(db.Model):
         """Return a representation of a shoppinglist instance."""
         return "<Shoppinglist: {}>".format(self.name, self.shared, self.zone)
 
-class Item(db.model):
+class Item(db.Model):
     """ this class defines items for shopping lists """
 
     __tablename__ = 'items'
@@ -153,7 +151,7 @@ class Item(db.model):
         """Return a representation of an item instance."""
         return "<Shoppinglist: {}>".format(self.name, self.price, self.quantity)
 
-class Buddy(db.model):
+class Buddy(db.Model):
     """ this class defines friends """
 
     __tablename__ = 'buddies'
