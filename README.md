@@ -5,7 +5,7 @@
 This is an innovative shopping list app that allows users to record and share things they want to spend money on. The app keeps track of their shopping lists. it is implemented as a flask RESTful API
 
 # installation procedure.
-  1. Ensure you have *python 3*, *virtualenv* and *pip* installed on your local machine.
+  1. Ensure you have *python 3*, *virtualenv*,*postgresql* and *pip* installed on your local machine.
   2. You might also need an app to test the API i.e *postman*
   3. Clone the project locally.
   4. navigate to the project folder.

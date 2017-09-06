@@ -14,7 +14,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Configurations for Testing, with its own database."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "postgresql:///test_db"
+    SQLALCHEMY_DATABASE_URI = "postgresql:///apitest_db"
     DEBUG = True
 
 
