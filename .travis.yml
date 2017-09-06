@@ -1,0 +1,17 @@
+
+language: python
+python:
+  - "3.5"
+  - "3.6"
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+
+script:
+  nosetests --with-coverage --cover-package=tests && coverage report
+after_success:
+  coveralls
+env:
+  - FLASK_VERSION=0.10.1
+notifications:
+  email: false
