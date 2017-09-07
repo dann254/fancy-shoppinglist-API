@@ -77,8 +77,6 @@ class Shoppinglist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
     shared = db.Column(db.Boolean(), nullable=False, server_default='0')
-    zone = db.Column(db.String(255))
-
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
@@ -87,12 +85,11 @@ class Shoppinglist(db.Model):
     items = db.relationship(
         'Item', order_by='Item.id', cascade="all, delete-orphan")
 
-    def __init__(self, name, shared, zone, owned_by):
+    def __init__(self, name, owned_by, shared=None):
         """Initialize the shoppinglist."""
         self.name = name
-        self.shared = shared
-        self.zone = zone
         self.owned_by = owned_by
+        self.shared = shared
 
     def save(self):
         """Save a shoppinglist.(update or save new)"""
@@ -149,7 +146,7 @@ class Item(db.Model):
 
     def __repr__(self):
         """Return a representation of an item instance."""
-        return "<Shoppinglist: {}>".format(self.name, self.price, self.quantity)
+        return "<Item: {}>".format(self.name, self.price, self.quantity)
 
 class Buddy(db.Model):
     """ this class defines friends """
