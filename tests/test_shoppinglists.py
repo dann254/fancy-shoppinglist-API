@@ -3,6 +3,7 @@ import os
 import json
 from app import create_app, db
 import urllib
+from urllib3 import urlencode
 
 class ShoppinglistTest(unittest.TestCase):
     """This class is a test case for shoppinglist"""
