@@ -271,7 +271,7 @@ def search():
                         results = Shoppinglist.query.filter(Shoppinglist.id.in_(result_ids)).all()
                         if not results:
                             return make_response(jsonify({ 'message': 'you dont have any shoppinglists with that name'})), 401
-                        for result in results:
+                        for shoppinglist in results:
                             obj = {
                                 'id': shoppinglist.id,
                                 'name': shoppinglist.name,
@@ -293,7 +293,7 @@ def search():
                         results = Shoppinglist.query.filter_by(owned_by=user_id).limit(list_limit)
                         if not results:
                             return make_response(jsonify({ 'message': 'you dont have any shopping lists within that range'})), 401
-                        for result in results:
+                        for shoppinglist in results:
                             obj = {
                                 'id': shoppinglist.id,
                                 'name': shoppinglist.name,
@@ -319,7 +319,7 @@ def search():
                         results = Shoppinglist.query.filter(Shoppinglist.id.in_(result_ids)).limit(request.args.get('limit'))
                         if not results:
                             return make_response(jsonify({ 'message': 'you dont have any shopping lists with that name in that range'})), 401
-                        for result in results:
+                        for shoppinglist in results:
                             obj = {
                                 'id': shoppinglist.id,
                                 'name': shoppinglist.name,
