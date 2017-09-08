@@ -182,17 +182,17 @@ class ShoppinglistTest(unittest.TestCase):
         results = json.loads(reqst.data.decode())
 
         # search the shoppinglist just created
-        req = self.client().get(self.search_route + '?{}'.format(urllib.perse.urlencode({"name":"clothes"})),
+        req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"name":"clothes"})),
             headers=dict(Auth="Bearer " + access_token))
         self.assertEqual(req.status_code, 201)
 
         # limit a search to 1
-        req2 = self.client().get(self.search_route + '?{}'.format(urllib.perse.urlencode({"limit":"1"})),
+        req2 = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"limit":"1"})),
             headers=dict(Auth="Bearer " + access_token))
         self.assertEqual(req2.status_code, 201)
 
         # search using name and limit
-        req = self.client().get(self.search_route + '?{}'.format(urllib.perse.urlencode({"name":"clothes", "limit":"1"})),
+        req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"name":"clothes", "limit":"1"})),
             headers=dict(Auth="Bearer " + access_token))
         self.assertEqual(req.status_code, 201)
 
