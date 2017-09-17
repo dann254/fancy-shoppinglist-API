@@ -180,7 +180,7 @@ class ShoppinglistTest(unittest.TestCase):
         self.assertEqual(reqst.status_code, 201)
 
         # search the shoppinglist just created
-        req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"name":"clothes"})),
+        req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"q":"clothes"})),
             headers=dict(Auth="Bearer " + access_token))
         self.assertEqual(req.status_code, 201)
 
@@ -190,7 +190,7 @@ class ShoppinglistTest(unittest.TestCase):
         self.assertEqual(req2.status_code, 201)
 
         # search using name and limit
-        req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"name":"clothes", "limit":"1"})),
+        req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"q":"clothes", "limit":"1"})),
             headers=dict(Auth="Bearer " + access_token))
         self.assertEqual(req.status_code, 201)
 
