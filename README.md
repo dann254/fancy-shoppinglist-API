@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/dann254/fancy-shoppinglist-API.svg?branch=master)](https://travis-ci.org/dann254/fancy-shoppinglist-API)
 [![Coverage Status](https://coveralls.io/repos/github/dann254/fancy-shoppinglist-API/badge.svg?branch=master)](https://coveralls.io/github/dann254/fancy-shoppinglist-API?branch=master)
 [![Code Health](https://landscape.io/github/dann254/fancy-shoppinglist-API/master/landscape.svg?style=flat)](https://landscape.io/github/dann254/fancy-shoppinglist-API/master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/08bdac7809b94946b3f3621d83a86f62)](https://www.codacy.com/app/dann254/fancy-shoppinglist-API?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dann254/fancy-shoppinglist-API&amp;utm_campaign=Badge_Grade)
 # fancy-shoppinglist-API
 This is an innovative shopping list app that allows users to record and share things they want to spend money on. The app keeps track of their shopping lists. it is implemented as a flask RESTful API
 
