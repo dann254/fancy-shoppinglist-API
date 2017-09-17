@@ -386,7 +386,6 @@ def items_view(id, **kwargs):
                         }
                         results.append(obj)
 
-                    print results
                     return make_response(jsonify(results=results)), 200
             else:
                 response = {
