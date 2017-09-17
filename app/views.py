@@ -260,7 +260,7 @@ def search():
                 return make_response(jsonify({ 'message': 'you dont have any shoppinglists'})), 404
 
             if not request.args.get('limit'):
-                list_name = str(request.args.get('name'))
+                list_name = str(request.args.get('q'))
                 if list_name:
                     result_ids = []
                     res = []
@@ -285,7 +285,7 @@ def search():
                     except Exception as e:
                         return make_response(jsonify({ 'message': str(e)})), 401
 
-            if not request.args.get('name'):
+            if not request.args.get('q'):
                 list_limit = request.args.get('limit')
                 if list_limit:
                     res = []
@@ -307,8 +307,8 @@ def search():
                     except Exception as e:
                         return make_response(jsonify({ 'message': str(e)})), 401
 
-            if request.args.get('limit') and request.args.get('name'):
-                list_name=str(request.args.get('name'))
+            if request.args.get('limit') and request.args.get('q'):
+                list_name=str(request.args.get('q'))
                 if list_name:
                     result_ids = []
                     res = []
