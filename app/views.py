@@ -357,8 +357,8 @@ def items_view(id, **kwargs):
             if shoppinglist.owned_by == user_id:
                 if request.method == "POST":
                     name = str(request.data.get('name', ''))
-                    price = str(request.data.get('price', ''))
-                    quantity = str(request.data.get('quantity', ''))
+                    price = int(request.data.get('price', ''))
+                    quantity = int(request.data.get('quantity', ''))
                     if name:
                         item = Item(name=name, price=price, quantity=quantity, belongs_to=id)
                         item.save()
@@ -374,20 +374,20 @@ def items_view(id, **kwargs):
 
                 else:
                     # get all items created for this shoppinglist
-                    items = Item.query.filter_by(belongs_to=id).all()
+                    item_list = Item.get_all(id)
                     results = []
-
-                    for item in items:
+                    for item in item_list:
                         obj = {
                             'id': item.id,
                             'name': item.name,
                             'price': item.price,
-                            'quantity': Item.quantity,
+                            'quantity': item.quantity,
                             'belongs_to': item.belongs_to
                         }
                         results.append(obj)
 
-                    return make_response(jsonify(results)), 200
+                    print results
+                    return make_response(jsonify(results=results)), 200
             else:
                 response = {
                     'message': 'anouthorized'

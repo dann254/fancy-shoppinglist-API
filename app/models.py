@@ -136,7 +136,7 @@ class Item(db.Model):
     @staticmethod
     def get_all(shoppinglist_id):
         """gets all the items for a given Shoppinglist."""
-        return Shoppinglist.query.filter_by(belongs_to=shoppinglist_id)
+        return Item.query.filter_by(belongs_to=shoppinglist_id)
 
     def delete(self):
         """Deletes a passed item."""
@@ -169,7 +169,7 @@ class Buddy(db.Model):
     @staticmethod
     def get_all(user_id):
         """gets all the items for a given Shoppinglist."""
-        return Shoppinglist.query.filter_by(parent=user_id)
+        return Buddy.query.filter_by(parent=user_id)
 
     def delete(self):
         """Deletes a passed buddy."""
