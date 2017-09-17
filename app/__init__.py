@@ -2,7 +2,7 @@ from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
 
 from instance.config import app_config
-from flask import request, jsonify, abort, make_response
+from flask import request, jsonify, abort
 # initialize sqlalchemy
 db = SQLAlchemy()
 

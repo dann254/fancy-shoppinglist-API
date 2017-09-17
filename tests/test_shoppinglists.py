@@ -1,5 +1,4 @@
 import unittest
-import os
 import json
 from app import create_app, db
 import urllib
@@ -179,7 +178,6 @@ class ShoppinglistTest(unittest.TestCase):
             headers=dict(Auth="Bearer " + access_token),
             data=self.shoppinglist)
         self.assertEqual(reqst.status_code, 201)
-        results = json.loads(reqst.data.decode())
 
         # search the shoppinglist just created
         req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"name":"clothes"})),

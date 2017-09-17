@@ -29,8 +29,6 @@ class AuthTest(unittest.TestCase):
     def test_registration(self):
         """Test if user registration works correctly and user is saved to db"""
         reqst = self.client().post(self.register_route, data=self.user_data)
-        #get the json of the returned result
-        result = json.loads(reqst.data.decode())
         #check that the message result contains a 201 status code
         self.assertEqual(reqst.status_code, 201)
 

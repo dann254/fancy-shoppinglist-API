@@ -1,4 +1,4 @@
-from flask import make_response, request, jsonify, Blueprint, abort,json
+from flask import make_response, request, jsonify, Blueprint, abort
 
 from app.models import User, Shoppinglist, Item
 
