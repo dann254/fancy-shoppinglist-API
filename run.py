@@ -5,4 +5,5 @@ from app import create_app
 config_name = os.getenv('APP_SETTINGS')
 app = create_app(config_name)
 
-app.run(port=5000)
+if __name__ == '__main__':
+    app.run(port=5000)
