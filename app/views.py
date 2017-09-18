@@ -6,6 +6,7 @@ from app.models import User, Shoppinglist, Item
 auth_bp = Blueprint('auth', __name__)
 shoppinglist_bp = Blueprint('shoppinglist',__name__)
 
+
 #route only takes post method and handles register
 @auth_bp.route('/auth/register', methods = ['POST'])
 def register():
@@ -126,8 +127,8 @@ def shoppinglists_view():
             }
             return make_response(jsonify(response)), 401
 
-@shoppinglist_bp.route('/shoppinglists/<int:id>', methods=['GET', 'PUT', 'DELETE'])
-def shoppinglist_manipulation(id, **kwargs):
+@shoppinglist_bp.route('/shoppinglists/<int:list_id>', methods=['GET', 'PUT', 'DELETE'])
+def shoppinglist_manipulation(list_id, **kwargs):
     # get the access token from  header
     auth_header = request.headers.get('Auth')
     access_token = auth_header.split(" ")[1]
@@ -139,7 +140,7 @@ def shoppinglist_manipulation(id, **kwargs):
         if not isinstance(user_id, str):
 
             # Get the shoppinglist with the id specified
-            shoppinglist = Shoppinglist.query.filter_by(id=id).first()
+            shoppinglist = Shoppinglist.query.filter_by(id=list_id).first()
             if not shoppinglist:
                 # There is no shoppinglist with this id for this user so raise 404 error
                 abort(404)
@@ -187,8 +188,8 @@ def shoppinglist_manipulation(id, **kwargs):
             # reurn an anouthorized message
             return make_response(jsonify(response)), 401
 
-@shoppinglist_bp.route('/shoppinglists/share/<int:id>', methods=['GET', 'PUT'])
-def shoppinglist_share(id, **kwargs):
+@shoppinglist_bp.route('/shoppinglists/share/<int:list_id>', methods=['GET', 'PUT'])
+def shoppinglist_share(list_id, **kwargs):
     # get the access token from  header
     auth_header = request.headers.get('Auth')
     access_token = auth_header.split(" ")[1]
@@ -200,7 +201,7 @@ def shoppinglist_share(id, **kwargs):
         if not isinstance(user_id, str):
 
             # Get the shoppinglist with the id specified
-            shoppinglist = Shoppinglist.query.filter_by(id=id).first()
+            shoppinglist = Shoppinglist.query.filter_by(id=list_id).first()
             if not shoppinglist:
                 # There is no shoppinglist with this id for this user so raise 404 error
                 abort(404)
@@ -342,8 +343,8 @@ def search():
             # reurn an anouthorized message
             return make_response(jsonify(response)), 401
 
-@shoppinglist_bp.route('/shoppinglists/items/<int:id>', methods=['POST', 'GET'])
-def items_view(id, **kwargs):
+@shoppinglist_bp.route('/shoppinglists/items/<int:list_id>', methods=['POST', 'GET'])
+def items_view(list_id):
     # Get the access token from header
     auth_header = request.headers.get('Auth')
     access_token = auth_header.split(" ")[1]
@@ -353,14 +354,14 @@ def items_view(id, **kwargs):
         user_id = User.decode_token(access_token)
         if not isinstance(user_id, str):
             # handle requests after authentication
-            shoppinglist = Shoppinglist.query.filter_by(id=id).first()
+            shoppinglist = Shoppinglist.query.filter_by(id=list_id).first()
             if shoppinglist.owned_by == user_id:
                 if request.method == "POST":
                     name = str(request.data.get('name', ''))
                     price = int(request.data.get('price', ''))
                     quantity = int(request.data.get('quantity', ''))
                     if name:
-                        item = Item(name=name, price=price, quantity=quantity, belongs_to=id)
+                        item = Item(name=name, price=price, quantity=quantity, belongs_to=list_id)
                         item.save()
                         response = jsonify({
                             'id': item.id,
@@ -374,7 +375,7 @@ def items_view(id, **kwargs):
 
                 else:
                     # get all items created for this shoppinglist
-                    item_list = Item.get_all(id)
+                    item_list = Item.get_all(list_id)
                     results = []
                     for item in item_list:
                         obj = {
@@ -399,4 +400,71 @@ def items_view(id, **kwargs):
             response = {
                 'message': message
             }
+            return make_response(jsonify(response)), 401
+
+@shoppinglist_bp.route('/shoppinglists/items/<int:list_id>/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])
+def item_manipulation(list_id, item_id, **kwargs):
+    # get the access token from  header
+    auth_header = request.headers.get('Auth')
+    access_token = auth_header.split(" ")[1]
+
+    if access_token:
+        # Get the user id in token
+        user_id = User.decode_token(access_token)
+        #check if token has an integer an doesnt creat an error
+        if not isinstance(user_id, str):
+
+            # Get the item with the id specified
+            item = Item.query.filter_by(id=item_id, belongs_to=list_id).first()
+            if not item:
+                # There is no item with this id for this shoppinglist so raise 404 error
+                abort(404)
+
+            if request.method == "DELETE":
+                # delete the item
+                item.delete()
+                return {
+                    "message": "{} item deleted".format(item.name)
+                }, 200
+
+            elif request.method == 'PUT':
+                #obtain updates from data if not, use the existing
+                name = str(request.data.get('name', '')) if str(request.data.get('name', '')) else item.name
+                price = str(request.data.get('price', '')) if str(request.data.get('price', '')) else item.price
+                quantity = str(request.data.get('quantity', '')) if str(request.data.get('quantity', '')) else item.quantity
+
+                item.name = name
+                item.price = price
+                item.quantity = quantity
+                item.save()
+
+                response = {
+                    'id': item.id,
+                    'name': item.name,
+                    'price': item.price,
+                    'quantity': item.quantity,
+                    'date_created': item.date_created,
+                    'date_modified': item.date_modified,
+                    'belongs_to': item.belongs_to
+                }
+                return make_response(jsonify(response)), 200
+            else:
+                # send back the item to the user if the request is GET
+                response = {
+                    'id': item.id,
+                    'name': item.name,
+                    'price': item.price,
+                    'quantity': item.quantity,
+                    'date_created': item.date_created,
+                    'date_modified': item.date_modified,
+                    'belongs_to': item.belongs_to
+                }
+                return make_response(jsonify(response)), 200
+        else:
+            # user is not authenticated send error message
+            message = user_id
+            response = {
+                'message': message
+            }
+            # reurn an anouthorized message
             return make_response(jsonify(response)), 401

@@ -17,6 +17,8 @@ class User(db.Model):
         'Buddy', order_by='Buddy.id', cascade="all, delete-orphan")
     shoppinglist = db.relationship(
         'Shoppinglist', order_by='Shoppinglist.id', cascade="all, delete-orphan")
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     def __init__(self, username, password):
         """Initialize user's username and password."""
@@ -78,9 +80,7 @@ class Shoppinglist(db.Model):
     name = db.Column(db.String(255))
     shared = db.Column(db.Boolean(), nullable=False, server_default='0')
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(
-        db.DateTime, default=db.func.current_timestamp(),
-        onupdate=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
     owned_by = db.Column(db.Integer, db.ForeignKey(User.id))
     items = db.relationship(
         'Item', order_by='Item.id', cascade="all, delete-orphan")
@@ -121,6 +121,8 @@ class Item(db.Model):
     price = db.Column(db.Integer())
     quantity = db.Column(db.Integer())
     belongs_to = db.Column(db.Integer, db.ForeignKey(Shoppinglist.id))
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     def __init__(self, name, price, quantity, belongs_to):
         """Initialize an item and its parent -shoppinglist"""

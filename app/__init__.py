@@ -19,4 +19,28 @@ def create_app(config_name):
     app.register_blueprint(shoppinglist_bp)
 
 
+    #custom error messages
+    @app.errorhandler(404)
+    def not_found(error=None):
+        message = {
+                'status': 404,
+                'message': 'Not Found: ' + request.url ,
+                'soft_note': 'Dont panic :-)'
+        }
+        resp = jsonify(message)
+        resp.status_code = 404
+
+        return resp
+    @app.errorhandler(405)
+    def not_allowed(error=None):
+        message = {
+                'status': 405,
+                'message': 'Method not allowed in: ' + request.url ,
+                'soft_note': 'Dont panic :-)'
+        }
+        resp = jsonify(message)
+        resp.status_code = 405
+
+        return resp
+
     return app
