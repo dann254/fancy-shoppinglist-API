@@ -19,7 +19,7 @@ def register():
             username = post_data['username']
             password = post_data['password']
             username = username.lower()
-            if not re.match(r"(^[a-zA-Z0-9_-@])", email):
+            if not re.match(r"(^[a-z0-9_-@])", username):
                 response = {
                     'message': 'please enter a valid username'
                 }
