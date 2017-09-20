@@ -18,6 +18,17 @@ def register():
             post_data = request.data
             username = post_data['username']
             password = post_data['password']
+            username = username.lower()
+            if not re.match(r"(^[a-zA-Z0-9_-@])", email):
+                response = {
+                    'message': 'please enter a valid username'
+                }
+                return make_response(jsonify(response)), 401
+            if len(password)<6 and len(confirm_pass)<6:
+                response = {
+                    'message': 'password must be atleast 6 character'
+                }
+                return make_response(jsonify(response)), 401
             user = User(username=username, password=password)
             user.save()
 
