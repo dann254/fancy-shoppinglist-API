@@ -25,9 +25,9 @@ def register():
                     'message': 'please enter a valid username'
                 }
                 return make_response(jsonify(response)), 401
-            if len(password)<6 and len(confirm_pass)<6:
+            if len(password)<6:
                 response = {
-                    'message': 'password must be atleast 6 character'
+                    'message': 'password must be at least 6 characters long'
                 }
                 return make_response(jsonify(response)), 401
             user = User(username=username, password=password)
@@ -101,6 +101,13 @@ def shoppinglists_view():
             if request.method == "POST":
                 name = str(request.data.get('name', ''))
                 if name:
+                    existing_list=Shoppinglist.query.filter_by(owned_by=user_id).all()
+                    for i in existing_list:
+                        if name == i.name:
+                            response = {
+                                'message': 'shoppinglist already exists'
+                            }
+                            return make_response(jsonify(response)), 401
                     shoppinglist = Shoppinglist(name=name, owned_by=user_id)
                     shoppinglist.save()
                     response = jsonify({
@@ -167,7 +174,13 @@ def shoppinglist_manipulation(list_id, **kwargs):
             elif request.method == 'PUT':
                 # obtain a name from data
                 name = str(request.data.get('name', ''))
-
+                existing_list=Shoppinglist.query.filter_by(owned_by=user_id).all()
+                for i in existing_list:
+                    if name == i.name:
+                        response = {
+                            'message': 'NOT UPDATED: shoppinglist with that name already exists'
+                        }
+                        return make_response(jsonify(response)), 401
                 shoppinglist.name = name
                 shoppinglist.save()
 
@@ -373,6 +386,13 @@ def items_view(list_id):
                     price = int(request.data.get('price', ''))
                     quantity = int(request.data.get('quantity', ''))
                     if name:
+                        existing_item=Item.query.filter_by(belongs_to=list_id).all()
+                        for i in existing_item:
+                            if name == i.name:
+                                response = {
+                                    'message': 'item with that name already exists'
+                                }
+                                return make_response(jsonify(response)), 401
                         item = Item(name=name, price=price, quantity=quantity, belongs_to=list_id)
                         item.save()
                         response = jsonify({
@@ -445,6 +465,13 @@ def item_manipulation(list_id, item_id, **kwargs):
                 price = str(request.data.get('price', '')) if str(request.data.get('price', '')) else item.price
                 quantity = str(request.data.get('quantity', '')) if str(request.data.get('quantity', '')) else item.quantity
 
+                existing_item=Item.query.filter_by(belongs_to=list_id).all()
+                for i in existing_item:
+                    if name == i.name:
+                        response = {
+                            'message': 'NOT UPDATED: item with that name already exists'
+                        }
+                        return mak
                 item.name = name
                 item.price = price
                 item.quantity = quantity
