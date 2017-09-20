@@ -368,7 +368,7 @@ def search():
             # reurn an anouthorized message
             return make_response(jsonify(response)), 401
 
-@shoppinglist_bp.route('/shoppinglists/items/<int:list_id>', methods=['POST', 'GET'])
+@shoppinglist_bp.route('/shoppinglists/<int:list_id>/items/', methods=['POST', 'GET'])
 def items_view(list_id):
     # Get the access token from header
     auth_header = request.headers.get('Auth')
@@ -434,7 +434,7 @@ def items_view(list_id):
             }
             return make_response(jsonify(response)), 401
 
-@shoppinglist_bp.route('/shoppinglists/items/<int:list_id>/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])
+@shoppinglist_bp.route('/shoppinglists/<int:list_id>/items/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])
 def item_manipulation(list_id, item_id, **kwargs):
     # get the access token from  header
     auth_header = request.headers.get('Auth')
