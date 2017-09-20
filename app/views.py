@@ -1,6 +1,7 @@
 from flask import make_response, request, jsonify, Blueprint, abort
 
 from app.models import User, Shoppinglist, Item
+import re
 
 # Define the blueprints
 auth_bp = Blueprint('auth', __name__)
@@ -19,7 +20,7 @@ def register():
             username = post_data['username']
             password = post_data['password']
             username = username.lower()
-            if not re.match(r"(^[a-z0-9_-@])", username):
+            if not re.match(r"^[a-z0-9_]*$", username):
                 response = {
                     'message': 'please enter a valid username'
                 }
