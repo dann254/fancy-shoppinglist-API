@@ -170,19 +170,31 @@ def shoppinglists_view():
                                     'owned_by': shoppinglist.owned_by
                                 }
                                 res.append(obj)
-                            return make_response(jsonify(result=res)), 201
+                            return make_response(jsonify(result=res)), 200
                         except Exception as e:
                             return make_response(jsonify({ 'message': str(e)})), 401
 
-                if not request.args.get('q'):
-                    list_limit = request.args.get('limit')
-                    if list_limit:
+                if request.args.get('limit') and request.args.get('start'):
+                    try:
+                        start=int(request.args.get('start'))
+                        limit=int(request.args.get('limit'))
+                    except:
+                        return make_response(jsonify({'info': 'Please enter limit or start as an integer'})), 401
+
+                    if start <= 0 or limit <= 0:
+                        return make_response(jsonify({'info': 'Start or Limit must be a number greater than or equal to 1'})), 401
+                    if start and limit:
                         res = []
                         try:
-                            results = Shoppinglist.query.filter_by(owned_by=user_id).limit(list_limit)
+                            results = Shoppinglist.query.filter_by(owned_by=user_id).paginate(start,limit,error_out=False)
                             if not results:
-                                return make_response(jsonify({ 'message': 'you dont have any shopping lists within that range'})), 401
-                            for shoppinglist in results:
+                                return make_response(jsonify({ 'message': 'error occured'})), 401
+                            url = '/shoppinglists/'
+                            links = {
+                                'next': url + '?start=%d&limit=%d' % (results.next_num, limit),
+                                'previous': url + '?start=%d&limit=%d' % (results.prev_num, limit)
+                            }
+                            for shoppinglist in results.items:
                                 obj = {
                                     'id': shoppinglist.id,
                                     'name': shoppinglist.name,
@@ -192,33 +204,7 @@ def shoppinglists_view():
                                     'owned_by': shoppinglist.owned_by
                                 }
                                 res.append(obj)
-                            return make_response(jsonify(result=res)), 201
-                        except Exception as e:
-                            return make_response(jsonify({ 'message': str(e)})), 401
-
-                if request.args.get('limit') and request.args.get('q'):
-                    list_name=str(request.args.get('q'))
-                    if list_name:
-                        result_ids = []
-                        res = []
-                        try:
-                            for slist in shoppinglist_content:
-                               if list_name in slist.name:
-                                    result_ids.append(slist.id)
-                            results = Shoppinglist.query.filter(Shoppinglist.id.in_(result_ids)).limit(request.args.get('limit'))
-                            if not results:
-                                return make_response(jsonify({ 'message': 'you dont have any shopping lists with that name in that range'})), 401
-                            for shoppinglist in results:
-                                obj = {
-                                    'id': shoppinglist.id,
-                                    'name': shoppinglist.name,
-                                    'shared': shoppinglist.shared,
-                                    'date_created': shoppinglist.date_created,
-                                    'date_modified': shoppinglist.date_modified,
-                                    'owned_by': shoppinglist.owned_by
-                                }
-                                res.append(obj)
-                            return make_response(jsonify(result=res)), 201
+                            return make_response(jsonify(links=links,result=res)), 200
                         except Exception as e:
                             return make_response(jsonify({ 'message': str(e)})), 401
                 else:

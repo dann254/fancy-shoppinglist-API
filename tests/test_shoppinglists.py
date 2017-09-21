@@ -187,17 +187,12 @@ class ShoppinglistTest(unittest.TestCase):
         # search the shoppinglist just created
         req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"q":"clothes"})),
             headers=dict(Auth="Bearer " + access_token))
-        self.assertEqual(req.status_code, 201)
+        self.assertEqual(req.status_code, 200)
 
-        # limit a search to 1
-        req2 = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"limit":"1"})),
+        # test pagination
+        req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"start":"1", "limit":"1"})),
             headers=dict(Auth="Bearer " + access_token))
-        self.assertEqual(req2.status_code, 201)
-
-        # search using name and limit
-        req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"q":"clothes", "limit":"1"})),
-            headers=dict(Auth="Bearer " + access_token))
-        self.assertEqual(req.status_code, 201)
+        self.assertEqual(req.status_code, 200)
 
     def test_item_creation(self):
         """Test if the API can create an item in a shoppinglist (POST)"""
