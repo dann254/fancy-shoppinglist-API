@@ -129,7 +129,7 @@ def shoppinglists_view():
             else:
                 if not request.args.get('limit') and not request.args.get('q'):
                     # get all shoppinglists created by this user
-                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id)
+                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).order_by(Shoppinglist.id)
                     results = []
 
                     for shoppinglist in shoppinglists:
@@ -148,7 +148,7 @@ def shoppinglists_view():
                     shoppinglist_content = Shoppinglist.query.filter_by(owned_by=user_id).all()
                     if not shoppinglist_content:
                         return make_response(jsonify({ 'message': 'you dont have any shoppinglists'})), 404
-                if not request.args.get('limit'):
+                if request.args.get('q'):
                     list_name = str(request.args.get('q'))
                     if list_name:
                         result_ids = []
@@ -186,7 +186,7 @@ def shoppinglists_view():
                     if start and limit:
                         res = []
                         try:
-                            results = Shoppinglist.query.filter_by(owned_by=user_id).paginate(start,limit,error_out=False)
+                            results = Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id).paginate(start,limit,error_out=False)
                             if not results:
                                 return make_response(jsonify({ 'message': 'error occured'})), 401
                             url = '/shoppinglists/'
@@ -220,7 +220,7 @@ def shoppinglists_view():
                             return make_response(jsonify({ 'message': str(e)})), 401
                 else:
                     # get all shoppinglists created by this user
-                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id)
+                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).order_by(Shoppinglist.id)
                     results = []
 
                     for shoppinglist in shoppinglists:
