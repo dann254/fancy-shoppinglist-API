@@ -43,6 +43,4 @@ def create_app(config_name):
 
         return resp
 
-        return resp
-
     return app
