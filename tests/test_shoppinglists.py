@@ -16,7 +16,7 @@ class ShoppinglistTest(unittest.TestCase):
         self.login_route = '/auth/login'
         self.shoppinglist_route = '/shoppinglists/'
         self.share_route = '/shoppinglists/share/'
-        self.search_route = '/shoppinglists/search'
+        self.search_route = '/shoppinglists/'
 
 
         # binds the app to the current context
