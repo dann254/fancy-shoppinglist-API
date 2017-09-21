@@ -178,7 +178,7 @@ def shoppinglists_view():
                     try:
                         start=int(request.args.get('start'))
                         limit=int(request.args.get('limit'))
-                    except:
+                    except Exception:
                         return make_response(jsonify({'info': 'Please enter limit or start as an integer'})), 401
 
                     if start <= 0 or limit <= 0:
@@ -190,10 +190,21 @@ def shoppinglists_view():
                             if not results:
                                 return make_response(jsonify({ 'message': 'error occured'})), 401
                             url = '/shoppinglists/'
-                            links = {
-                                'next': url + '?start=%d&limit=%d' % (results.next_num, limit),
-                                'previous': url + '?start=%d&limit=%d' % (results.prev_num, limit)
+                            previous = results.prev_num
+                            nextint= results.next_num
+                            if start<=1:links = {
+                                'next': url + '?start=%d&limit=%d' % (nextint, limit)
                             }
+                            elif len(results.items)<limit :
+                                links = {
+                                    'previous': url + '?start=%d&limit=%d' % (previous, limit)
+                                }
+                            else:
+                                links = {
+                                'next': url + '?start=%d&limit=%d' % (nextint, limit),
+                                'previous': url + '?start=%d&limit=%d' % (previous, limit)
+                                }
+
                             for shoppinglist in results.items:
                                 obj = {
                                     'id': shoppinglist.id,
