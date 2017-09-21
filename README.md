@@ -12,12 +12,13 @@ This is an innovative shopping list app that allows users to record and share th
   4. navigate to the project folder.
   5. create a virtual environment. example `mkvirtualenv fancy`
   6. create a `.env` file  like
-    ```
-    workon api
-    export SECRET="random_key"
-    export APP_SETTINGS="development"
-    export DATABASE_URL="postgresql:///my_db"
-    ```
+
+  ```
+  workon api
+  export SECRET="random_key"
+  export APP_SETTINGS="development"
+  export DATABASE_URL="postgresql:///my_db"
+  ```
     and change the first line to the environment you just created. i.e`workon fancy`. PS you might need to edit it based on your operating system.
   7. Run `source .env` if you are on unix or find the equivalent on windows.
   8. install the requirements in the environment. `pip install -r requirements.txt`
