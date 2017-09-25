@@ -1,6 +1,6 @@
 from flask import make_response, request, jsonify, Blueprint, abort
 
-from app.models import User, Shoppinglist, Item
+from app.models import User, Shoppinglist, Item, Buddy
 import re
 
 # Define the blueprints
@@ -504,6 +504,80 @@ def item_manipulation(list_id, item_id, **kwargs):
                     'belongs_to': item.belongs_to
                 }
                 return make_response(jsonify(response)), 200
+        else:
+            # user is not authenticated send error message
+            message = user_id
+            response = {
+                'message': message
+            }
+            # reurn an anouthorized message
+            return make_response(jsonify(response)), 401
+
+@shoppinglist_bp.route('/buddies/', methods=['GET', 'POST'])
+def buddies_view():
+    # get the access token from  header
+    auth_header = request.headers.get('Auth')
+    access_token = auth_header.split(" ")[1]
+
+    if access_token:
+        # Get the user id in token
+        user_id = User.decode_token(access_token)
+        #check if token has an integer an doesnt creat an error
+        if not isinstance(user_id, str):
+
+            if request.method == "POST":
+                username = str(request.data.get('username', ''))
+                if username:
+                    buddies = Buddy.query.filter_by(parent=user_id).all()
+                    user = User.query.filter_by(username=username).first()
+                    if not user:
+                        response = {
+                            'message': 'friend not added: User does not exist.'
+                        }
+                        # return user doesnt exist
+                        return make_response(jsonify(response)), 401
+                    if user.id == user_id:
+                        response = {
+                            'message': 'You can\'nt  add yourself as a friend.'
+                        }
+                        # return user doesnt exist
+                        return make_response(jsonify(response)), 401
+                    exists = False
+                    for i in buddies:
+                        exists = True if i.friend_id == user.id else False
+
+                    if exists == True:
+                        response = {
+                            'message': 'Not added: You are already friends.'
+                        }
+                        # return user doesnt exist
+                        return make_response(jsonify(response)), 401
+
+                    buddy = Buddy(parent=user_id,friend_id=user.id)
+                    buddy_two = Buddy(parent=user.id,friend_id=user_id)
+                    buddy.save()
+                    buddy_two.save()
+
+                    response = {
+                        'message': 'Success: friend added.',
+                        'username': username,
+                        'friend_id': user.id
+                    }
+                    # return success
+                    return make_response(jsonify(response)), 201
+            else:
+                buddies = Buddy.query.all()
+                friend = []
+                for b in buddies:
+                    user = User.query.filter_by(id=b.friend_id, parent=user_id).first()
+                    response = {
+                        'message': 'Success: friend added.',
+                        'username': username,
+                        'friend_id': user.id
+                    }
+                    friend.append(response)
+                # return success
+                return make_response(jsonify(friend)), 201
         else:
             # user is not authenticated send error message
             message = user_id
