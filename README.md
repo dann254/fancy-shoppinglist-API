@@ -8,10 +8,18 @@ This is an innovative shopping list app that allows users to record and share th
 # installation procedure.
   1. Ensure you have *python 3*, *virtualenv*,*postgresql* and *pip* installed on your local machine.
   2. You might also need an app to test the API i.e *postman*
-  3. Clone the project locally.
+  3. Clone the project locally. and create a postgres database like `my_db`
   4. navigate to the project folder.
   5. create a virtual environment. example `mkvirtualenv fancy`
-  6. Go to the `.env` file and change the first line to the enviroment you just created. i.e`workon fancy`.
+  6. create a `.env` file and change the first line to the environment you just created. i.e`workon fancy`. PS you might need to edit it based on your operating system. like
+
+  ```
+  workon api
+  export SECRET="random_key"
+  export APP_SETTINGS="development"
+  export DATABASE_URL="postgresql:///my_db"
+  ```
+
   7. Run `source .env` if you are on unix or find the equivalent on windows.
   8. install the requirements in the environment. `pip install -r requirements.txt`
 

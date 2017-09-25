@@ -1,6 +1,7 @@
 from flask import make_response, request, jsonify, Blueprint, abort
 
 from app.models import User, Shoppinglist, Item
+import re
 
 # Define the blueprints
 auth_bp = Blueprint('auth', __name__)
@@ -18,6 +19,17 @@ def register():
             post_data = request.data
             username = post_data['username']
             password = post_data['password']
+            username = username.lower()
+            if not re.match(r"^[a-z0-9_]*$", username):
+                response = {
+                    'message': 'please enter a valid username'
+                }
+                return make_response(jsonify(response)), 401
+            if len(password)<6:
+                response = {
+                    'message': 'password must be at least 6 characters long'
+                }
+                return make_response(jsonify(response)), 401
             user = User(username=username, password=password)
             user.save()
 
@@ -89,6 +101,18 @@ def shoppinglists_view():
             if request.method == "POST":
                 name = str(request.data.get('name', ''))
                 if name:
+                    if not re.match(r"^[a-z0-9_ -]*$", name):
+                        response = {
+                            'message': 'please enter a valid shoppinglist name'
+                        }
+                        return make_response(jsonify(response)), 401
+                    existing_list=Shoppinglist.query.filter_by(owned_by=user_id).all()
+                    for i in existing_list:
+                        if name == i.name:
+                            response = {
+                                'message': 'shoppinglist already exists'
+                            }
+                            return make_response(jsonify(response)), 401
                     shoppinglist = Shoppinglist(name=name, owned_by=user_id)
                     shoppinglist.save()
                     response = jsonify({
@@ -103,22 +127,115 @@ def shoppinglists_view():
                     return make_response(response), 201
 
             else:
-                # get all shoppinglists created by this user
-                shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id)
-                results = []
+                if not request.args.get('limit') and not request.args.get('q'):
+                    # get all shoppinglists created by this user
+                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).order_by(Shoppinglist.id)
+                    results = []
 
-                for shoppinglist in shoppinglists:
-                    obj = {
-                        'id': shoppinglist.id,
-                        'name': shoppinglist.name,
-                        'shared': shoppinglist.shared,
-                        'date_created': shoppinglist.date_created,
-                        'date_modified': shoppinglist.date_modified,
-                        'owned_by': shoppinglist.owned_by
-                    }
-                    results.append(obj)
+                    for shoppinglist in shoppinglists:
+                        obj = {
+                            'id': shoppinglist.id,
+                            'name': shoppinglist.name,
+                            'shared': shoppinglist.shared,
+                            'date_created': shoppinglist.date_created,
+                            'date_modified': shoppinglist.date_modified,
+                            'owned_by': shoppinglist.owned_by
+                        }
+                        results.append(obj)
 
-                return make_response(jsonify(results=results)), 200
+                    return make_response(jsonify(results=results)), 200
+                if not isinstance(user_id, str):
+                    shoppinglist_content = Shoppinglist.query.filter_by(owned_by=user_id).all()
+                    if not shoppinglist_content:
+                        return make_response(jsonify({ 'message': 'you dont have any shoppinglists'})), 404
+                if request.args.get('q'):
+                    list_name = str(request.args.get('q'))
+                    if list_name:
+                        result_ids = []
+                        res = []
+                        try:
+                            for slist in shoppinglist_content:
+                               if list_name in slist.name:
+                                    result_ids.append(slist.id)
+                            results = Shoppinglist.query.filter(Shoppinglist.id.in_(result_ids)).all()
+                            if not results:
+                                return make_response(jsonify({ 'message': 'you dont have any shoppinglists with that name'})), 401
+                            for shoppinglist in results:
+                                obj = {
+                                    'id': shoppinglist.id,
+                                    'name': shoppinglist.name,
+                                    'shared': shoppinglist.shared,
+                                    'date_created': shoppinglist.date_created,
+                                    'date_modified': shoppinglist.date_modified,
+                                    'owned_by': shoppinglist.owned_by
+                                }
+                                res.append(obj)
+                            return make_response(jsonify(result=res)), 200
+                        except Exception as e:
+                            return make_response(jsonify({ 'message': str(e)})), 401
+
+                if request.args.get('limit') and request.args.get('start'):
+                    try:
+                        start=int(request.args.get('start'))
+                        limit=int(request.args.get('limit'))
+                    except Exception:
+                        return make_response(jsonify({'info': 'Please enter limit or start as an integer'})), 401
+
+                    if start <= 0 or limit <= 0:
+                        return make_response(jsonify({'info': 'Start or Limit must be a number greater than or equal to 1'})), 401
+                    if start and limit:
+                        res = []
+                        try:
+                            results = Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id).paginate(start,limit,error_out=False)
+                            if not results:
+                                return make_response(jsonify({ 'message': 'error occured'})), 401
+                            url = '/shoppinglists/'
+                            previous = results.prev_num
+                            nextint= results.next_num
+                            if start<=1:links = {
+                                'next': url + '?start=%d&limit=%d' % (nextint, limit)
+                            }
+                            elif len(results.items)<limit :
+                                links = {
+                                    'previous': url + '?start=%d&limit=%d' % (previous, limit)
+                                }
+                            else:
+                                links = {
+                                'next': url + '?start=%d&limit=%d' % (nextint, limit),
+                                'previous': url + '?start=%d&limit=%d' % (previous, limit)
+                                }
+
+                            for shoppinglist in results.items:
+                                obj = {
+                                    'id': shoppinglist.id,
+                                    'name': shoppinglist.name,
+                                    'shared': shoppinglist.shared,
+                                    'date_created': shoppinglist.date_created,
+                                    'date_modified': shoppinglist.date_modified,
+                                    'owned_by': shoppinglist.owned_by
+                                }
+                                res.append(obj)
+                            return make_response(jsonify(links=links,result=res)), 200
+                        except Exception as e:
+                            return make_response(jsonify({ 'message': str(e)})), 401
+                else:
+                    # get all shoppinglists created by this user
+                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).order_by(Shoppinglist.id)
+                    results = []
+
+                    for shoppinglist in shoppinglists:
+                        obj = {
+                            'id': shoppinglist.id,
+                            'name': shoppinglist.name,
+                            'shared': shoppinglist.shared,
+                            'date_created': shoppinglist.date_created,
+                            'date_modified': shoppinglist.date_modified,
+                            'owned_by': shoppinglist.owned_by
+                        }
+                        results.append(obj)
+
+                    return make_response(jsonify(results=results)), 200
+
         else:
             # user is not authorised return error message
             message = user_id
@@ -155,7 +272,13 @@ def shoppinglist_manipulation(list_id, **kwargs):
             elif request.method == 'PUT':
                 # obtain a name from data
                 name = str(request.data.get('name', ''))
-
+                existing_list=Shoppinglist.query.filter_by(owned_by=user_id).all()
+                for i in existing_list:
+                    if name == i.name:
+                        response = {
+                            'message': 'NOT UPDATED: shoppinglist with that name already exists'
+                        }
+                        return make_response(jsonify(response)), 401
                 shoppinglist.name = name
                 shoppinglist.save()
 
@@ -244,106 +367,8 @@ def shoppinglist_share(list_id, **kwargs):
             # reurn an anouthorized message
             return make_response(jsonify(response)), 401
 
-@shoppinglist_bp.route('/shoppinglists/search', methods=['GET'])
-def search():
-    """allow the user to querry the database by name"""
-    # get the access token from  header
-    auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
 
-    if access_token:
-        # Get the user id rin token
-        user_id = User.decode_token(access_token)
-        #check if token has an integer an doesnt creat an error
-        if not isinstance(user_id, str):
-            shoppinglist_content = Shoppinglist.query.filter_by(owned_by=user_id).all()
-            if not shoppinglist_content:
-                return make_response(jsonify({ 'message': 'you dont have any shoppinglists'})), 404
-
-            if not request.args.get('limit'):
-                list_name = str(request.args.get('q'))
-                if list_name:
-                    result_ids = []
-                    res = []
-                    try:
-                        for slist in shoppinglist_content:
-                           if list_name in slist.name:
-                                result_ids.append(slist.id)
-                        results = Shoppinglist.query.filter(Shoppinglist.id.in_(result_ids)).all()
-                        if not results:
-                            return make_response(jsonify({ 'message': 'you dont have any shoppinglists with that name'})), 401
-                        for shoppinglist in results:
-                            obj = {
-                                'id': shoppinglist.id,
-                                'name': shoppinglist.name,
-                                'shared': shoppinglist.shared,
-                                'date_created': shoppinglist.date_created,
-                                'date_modified': shoppinglist.date_modified,
-                                'owned_by': shoppinglist.owned_by
-                            }
-                            res.append(obj)
-                        return make_response(jsonify(result=res)), 201
-                    except Exception as e:
-                        return make_response(jsonify({ 'message': str(e)})), 401
-
-            if not request.args.get('q'):
-                list_limit = request.args.get('limit')
-                if list_limit:
-                    res = []
-                    try:
-                        results = Shoppinglist.query.filter_by(owned_by=user_id).limit(list_limit)
-                        if not results:
-                            return make_response(jsonify({ 'message': 'you dont have any shopping lists within that range'})), 401
-                        for shoppinglist in results:
-                            obj = {
-                                'id': shoppinglist.id,
-                                'name': shoppinglist.name,
-                                'shared': shoppinglist.shared,
-                                'date_created': shoppinglist.date_created,
-                                'date_modified': shoppinglist.date_modified,
-                                'owned_by': shoppinglist.owned_by
-                            }
-                            res.append(obj)
-                        return make_response(jsonify(result=res)), 201
-                    except Exception as e:
-                        return make_response(jsonify({ 'message': str(e)})), 401
-
-            if request.args.get('limit') and request.args.get('q'):
-                list_name=str(request.args.get('q'))
-                if list_name:
-                    result_ids = []
-                    res = []
-                    try:
-                        for slist in shoppinglist_content:
-                           if list_name in slist.name:
-                                result_ids.append(slist.id)
-                        results = Shoppinglist.query.filter(Shoppinglist.id.in_(result_ids)).limit(request.args.get('limit'))
-                        if not results:
-                            return make_response(jsonify({ 'message': 'you dont have any shopping lists with that name in that range'})), 401
-                        for shoppinglist in results:
-                            obj = {
-                                'id': shoppinglist.id,
-                                'name': shoppinglist.name,
-                                'shared': shoppinglist.shared,
-                                'date_created': shoppinglist.date_created,
-                                'date_modified': shoppinglist.date_modified,
-                                'owned_by': shoppinglist.owned_by
-                            }
-                            res.append(obj)
-                        return make_response(jsonify(result=res)), 201
-                    except Exception as e:
-                        return make_response(jsonify({ 'message': str(e)})), 401
-
-        else:
-            # user is not authenticated send error message
-            message = user_id
-            response = {
-                'message': message
-            }
-            # reurn an anouthorized message
-            return make_response(jsonify(response)), 401
-
-@shoppinglist_bp.route('/shoppinglists/items/<int:list_id>', methods=['POST', 'GET'])
+@shoppinglist_bp.route('/shoppinglists/<int:list_id>/items/', methods=['POST', 'GET'])
 def items_view(list_id):
     # Get the access token from header
     auth_header = request.headers.get('Auth')
@@ -361,6 +386,18 @@ def items_view(list_id):
                     price = int(request.data.get('price', ''))
                     quantity = int(request.data.get('quantity', ''))
                     if name:
+                        if not re.match(r"^[a-z0-9_ -]*$", name):
+                            response = {
+                                'message': 'please enter a valid item name'
+                            }
+                            return make_response(jsonify(response)), 401
+                        existing_item=Item.query.filter_by(belongs_to=list_id).all()
+                        for i in existing_item:
+                            if name == i.name:
+                                response = {
+                                    'message': 'item with that name already exists'
+                                }
+                                return make_response(jsonify(response)), 401
                         item = Item(name=name, price=price, quantity=quantity, belongs_to=list_id)
                         item.save()
                         response = jsonify({
@@ -402,7 +439,7 @@ def items_view(list_id):
             }
             return make_response(jsonify(response)), 401
 
-@shoppinglist_bp.route('/shoppinglists/items/<int:list_id>/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])
+@shoppinglist_bp.route('/shoppinglists/<int:list_id>/items/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])
 def item_manipulation(list_id, item_id, **kwargs):
     # get the access token from  header
     auth_header = request.headers.get('Auth')
@@ -433,6 +470,13 @@ def item_manipulation(list_id, item_id, **kwargs):
                 price = str(request.data.get('price', '')) if str(request.data.get('price', '')) else item.price
                 quantity = str(request.data.get('quantity', '')) if str(request.data.get('quantity', '')) else item.quantity
 
+                existing_item=Item.query.filter_by(belongs_to=list_id).all()
+                for i in existing_item:
+                    if name == i.name and item_id != i.id:
+                        response = {
+                            'message': 'NOT UPDATED: item with that name already exists'
+                        }
+                        return make_response(jsonify(response)), 401
                 item.name = name
                 item.price = price
                 item.quantity = quantity
