@@ -649,7 +649,7 @@ def buddies_list_view():
                 blists = []
                 result = []
                 for b in buddies:
-                    slist = Shoppinglist.query.filter_by(id=b.friend_id, shared=True).first()
+                    slist = Shoppinglist.query.filter_by(owned_by=b.friend_id, shared=True).first()
                     blists.append(slist)
                 if blists == []:
                     abort(404)
@@ -660,6 +660,55 @@ def buddies_list_view():
                         'shared': l.shared,
                         'date_created': l.date_created,
                         'owned_by': l.owned_by
+                    }
+                    result.append(obj)
+                # return success
+                return make_response(jsonify(result=result)), 200
+        else:
+            # user is not authenticated send error message
+            message = user_id
+            response = {
+                'message': message
+            }
+            # reurn an anouthorized message
+            return make_response(jsonify(response)), 401
+
+@shoppinglist_bp.route('/buddies/shoppinglists/<int:list_id>', methods=['GET'])
+def buddies_list_items_view(list_id):
+    # get the access token from  header
+    auth_header = request.headers.get('Auth')
+    access_token = auth_header.split(" ")[1]
+
+    if access_token:
+        # Get the user id in token
+        user_id = User.decode_token(access_token)
+        #check if token has an integer an doesnt creat an error
+        if not isinstance(user_id, str):
+            buddies = Buddy.query.filter_by(parent=user_id).all()
+            if not int(list_id):
+                abort(404)
+
+            else:
+                result = []
+                slist = Shoppinglist.query.filter_by(id=list_id, shared=True).first()
+                buddy = Buddy.query.filter_by(parent=user_id,friend_id=slist.owned_by).first()
+                if not slist or not buddy:
+                    response = {
+                        'message': 'Anouthorized'
+                    }
+                    # return 401
+                    return make_response(jsonify(response)), 401
+                slist_items = Item.query.filter_by(belongs_to=list_id).all()
+                if not slist_items:
+                    abort(404)
+                for item in slist_items:
+                    obj = {
+                        'id': item.id,
+                        'name': item.name,
+                        'price': item.price,
+                        'quantity': item.quantity,
+                        'date_created': item.date_created,
+                        'belongs_to': item.belongs_to
                     }
                     result.append(obj)
                 # return success
