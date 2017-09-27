@@ -629,3 +629,46 @@ def buddies_view_by_id(friend_id):
             }
             # reurn an anouthorized message
             return make_response(jsonify(response)), 401
+
+@shoppinglist_bp.route('/buddies/shoppinglists/', methods=['GET'])
+def buddies_list_view():
+    # get the access token from  header
+    auth_header = request.headers.get('Auth')
+    access_token = auth_header.split(" ")[1]
+
+    if access_token:
+        # Get the user id in token
+        user_id = User.decode_token(access_token)
+        #check if token has an integer an doesnt creat an error
+        if not isinstance(user_id, str):
+            buddies = Buddy.query.filter_by(parent=user_id).all()
+            if not buddies:
+                abort(404)
+
+            else:
+                blists = []
+                result = []
+                for b in buddies:
+                    slist = Shoppinglist.query.filter_by(id=b.friend_id, shared=True).first()
+                    blists.append(slist)
+                if blists == []:
+                    abort(404)
+                for l in blists:
+                    obj = {
+                        'id': l.id,
+                        'name': l.name,
+                        'shared': l.shared,
+                        'date_created': l.date_created,
+                        'owned_by': l.owned_by
+                    }
+                    result.append(obj)
+                # return success
+                return make_response(jsonify(result=result)), 200
+        else:
+            # user is not authenticated send error message
+            message = user_id
+            response = {
+                'message': message
+            }
+            # reurn an anouthorized message
+            return make_response(jsonify(response)), 401

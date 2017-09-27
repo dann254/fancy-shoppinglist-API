@@ -181,8 +181,8 @@ class ShoppinglistTest(unittest.TestCase):
         self.assertEqual(reqst.status_code, 200)
         self.assertIn('clothes sl', str(reqst.data))
 
-    def test_view_shared_lists_by_id(self):
-        """Test if a user can view shared lists of invited friends by its id """
+    def test_view_shared_lists_items(self):
+        """Test if a user can view shared lists items of invited friends"""
         self.register_user()
         self.register_user_two()
         result = self.login_user()
@@ -197,6 +197,12 @@ class ShoppinglistTest(unittest.TestCase):
             headers=dict(Auth="Bearer " + access_token))
         self.assertEqual(req.status_code, 200)
 
+        # create a item using post
+        item_reqst = self.client().post(self.shoppinglist_route + '{}'.format(results['id'])+'/items/',
+            headers=dict(Auth="Bearer " + str(access_token)),
+            data=self.item)
+        self.assertEqual(item_reqst.status_code, 201)
+        self.assertIn('shirt', str(item_reqst.data))
 
         result_two = self.login_user_two()
         access_token = json.loads(result_two.data.decode())['access_token']
@@ -209,12 +215,12 @@ class ShoppinglistTest(unittest.TestCase):
         self.assertEqual(buddy_reqst.status_code, 201)
         self.assertIn('thisuser', str(buddy_reqst.data))
 
-        # get all the shoppinglists shared by buddies
+        # get items the shoppinglists shared by buddies
         reqst = self.client().get(self.buddies_list_route + '{}'.format(results['id']),
             headers=dict(Auth="Bearer " + access_token),
         )
         self.assertEqual(reqst.status_code, 200)
-        self.assertIn('clothes sl', str(reqst.data))
+        self.assertIn('shirt', str(reqst.data))
 
 if __name__ == "__main__":
     unittest.main()
