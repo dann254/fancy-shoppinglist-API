@@ -1,7 +1,6 @@
 import unittest
 import json
 from app import create_app, db
-import urllib
 
 class ShoppinglistTest(unittest.TestCase):
     """This class is a test case for shoppinglist"""
@@ -70,7 +69,6 @@ class ShoppinglistTest(unittest.TestCase):
         reqst = self.client().post(self.shoppinglist_route,
             headers=dict(Auth="Bearer " + str(access_token)),
             data=self.shoppinglist)
-        results = json.loads(reqst.data.decode())
 
         result_two = self.login_user_two()
         access_token = json.loads(result_two.data.decode())['access_token']
@@ -98,7 +96,6 @@ class ShoppinglistTest(unittest.TestCase):
         buddy_reqst = self.client().post(self.buddies_route,
             headers=dict(Auth="Bearer " + str(access_token)),
             data=self.buddy)
-        results = json.loads(buddy_reqst.data.decode())
 
         self.assertEqual(buddy_reqst.status_code, 201)
         self.assertIn('thisuser', str(buddy_reqst.data))

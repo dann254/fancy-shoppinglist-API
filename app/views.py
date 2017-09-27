@@ -685,7 +685,6 @@ def buddies_list_items_view(list_id):
         user_id = User.decode_token(access_token)
         #check if token has an integer an doesnt creat an error
         if not isinstance(user_id, str):
-            buddies = Buddy.query.filter_by(parent=user_id).all()
             if not int(list_id):
                 abort(404)
 
