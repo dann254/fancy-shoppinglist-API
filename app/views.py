@@ -553,8 +553,8 @@ def buddies_view():
                         # return user doesnt exist
                         return make_response(jsonify(response)), 401
 
-                    buddy = Buddy(parent=user_id,friend_id=user.id)
-                    buddy_two = Buddy(parent=user.id,friend_id=user_id)
+                    buddy = Buddy(friend_id=user.id,parent=user_id)
+                    buddy_two = Buddy(friend_id=user_id,parent=user.id)
                     buddy.save()
                     buddy_two.save()
 
@@ -566,18 +566,61 @@ def buddies_view():
                     # return success
                     return make_response(jsonify(response)), 201
             else:
-                buddies = Buddy.query.all()
-                friend = []
+                buddies = Buddy.query.filter_by(parent=user_id).all()
+                response = []
                 for b in buddies:
-                    user = User.query.filter_by(id=b.friend_id, parent=user_id).first()
-                    response = {
-                        'message': 'Success: friend added.',
-                        'username': username,
+                    user = User.query.filter_by(id=b.friend_id).first()
+                    friend = {
+                        'username': user.username,
                         'friend_id': user.id
                     }
-                    friend.append(response)
+                    response.append(friend)
                 # return success
-                return make_response(jsonify(friend)), 201
+                return make_response(jsonify(result=response)), 201
+        else:
+            # user is not authenticated send error message
+            message = user_id
+            response = {
+                'message': message
+            }
+            # reurn an anouthorized message
+            return make_response(jsonify(response)), 401
+
+@shoppinglist_bp.route('/buddies/<int:friend_id>', methods=['GET', 'DELETE'])
+def buddies_view_by_id(friend_id):
+    # get the access token from  header
+    auth_header = request.headers.get('Auth')
+    access_token = auth_header.split(" ")[1]
+
+    if access_token:
+        # Get the user id in token
+        user_id = User.decode_token(access_token)
+        #check if token has an integer an doesnt creat an error
+        if not isinstance(user_id, str):
+            buddies = Buddy.query.filter_by(parent=user_id,friend_id=friend_id).all()
+            if not buddies:
+                abort(404)
+            if request.method == "DELETE":
+                buddy=Buddy.query.filter_by(parent=user_id,friend_id=friend_id).first()
+                parent=Buddy.query.filter_by(friend_id=user_id,parent=friend_id).first()
+                buddy.delete()
+                parent.delete()
+                response = {
+                    'message': '{} unfriended'.format(friend_id)
+                }
+                # return ok
+                return make_response(jsonify(response)), 200
+            else:
+                buddies = Buddy.query.filter_by(parent=user_id,friend_id=friend_id).all()
+                response = []
+                for b in buddies:
+                    user = User.query.filter_by(id=b.friend_id).first()
+                    friend = {
+                        'username': user.username,
+                        'friend_id': b.friend_id
+                    }
+                # return success
+                return make_response(jsonify(friend)), 200
         else:
             # user is not authenticated send error message
             message = user_id
