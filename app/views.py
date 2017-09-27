@@ -649,19 +649,20 @@ def buddies_list_view():
                 blists = []
                 result = []
                 for b in buddies:
-                    slist = Shoppinglist.query.filter_by(owned_by=b.friend_id, shared=True).first()
+                    slist = Shoppinglist.query.filter_by(owned_by=b.friend_id, shared=True).all()
                     blists.append(slist)
                 if blists == []:
                     abort(404)
-                for l in blists:
-                    obj = {
-                        'id': l.id,
-                        'name': l.name,
-                        'shared': l.shared,
-                        'date_created': l.date_created,
-                        'owned_by': l.owned_by
-                    }
-                    result.append(obj)
+                for slist in blists:
+                    for l in slist:
+                        obj = {
+                            'id': l.id,
+                            'name': l.name,
+                            'shared': l.shared,
+                            'date_created': l.date_created,
+                            'owned_by': l.owned_by
+                        }
+                        result.append(obj)
                 # return success
                 return make_response(jsonify(result=result)), 200
         else:
