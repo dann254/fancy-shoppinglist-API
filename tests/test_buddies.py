@@ -2,8 +2,8 @@ import unittest
 import json
 from app import create_app, db
 
-class ShoppinglistTest(unittest.TestCase):
-    """This class is a test case for shoppinglist"""
+class BuddyTest(unittest.TestCase):
+    """This class is a test case for buddies"""
 
     def setUp(self):
         """Initialize app and define variables"""

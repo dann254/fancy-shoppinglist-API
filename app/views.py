@@ -7,6 +7,12 @@ import re
 auth_bp = Blueprint('auth', __name__)
 shoppinglist_bp = Blueprint('shoppinglist',__name__)
 
+@auth_bp.route('/', methods = ['GET'])
+def home():
+    response = {
+        'message': 'welcome to Fancy shoppinglist API'
+    }
+    return make_response(jsonify(response)), 200
 
 #route only takes post method and handles register
 @auth_bp.route('/auth/register', methods = ['POST'])
@@ -87,6 +93,63 @@ def login():
         #return using code 500 internal server error
         return make_response(jsonify(response)), 500
 
+@auth_bp.route('/user/', methods=['GET', 'PUT', 'DELETE'])
+def user_profile():
+    # get the access token from  header
+    auth_header = request.headers.get('Auth')
+    access_token = auth_header.split(" ")[1]
+
+    if access_token:
+        # Get the user id in token
+        user_id = User.decode_token(access_token)
+        #check if token has an integer an doesnt creat an error
+        if not isinstance(user_id, str):
+            user=User.query.filter_by(id=user_id).first()
+            if request.method == 'PUT':
+                # obtain a username from data
+                username = str(request.data.get('username', ''))
+                existing_user=User.query.all()
+                for i in existing_user:
+                    if username == i.username:
+                        response = {
+                            'message': 'NOT UPDATED: a user with that name already exists'
+                        }
+                        return make_response(jsonify(response)), 401
+                user.username = username
+                user.save()
+
+                response = {
+                    'id': user.id,
+                    'username': user.username,
+                    'date_created': user.date_created,
+                    'date_modified': user.date_modified
+                }
+                return make_response(jsonify(response)), 200
+            if request.method == 'DELETE':
+                buddy = Buddy.query.filter_by(friend_id=user_id).all()
+                for i in buddy:
+                    i.delete()
+                # delete the user
+                user.delete()
+                return {
+                    "message": "user {} deleted".format(user.username)
+                }, 200
+            else:
+                profile = jsonify({
+                    'id': user.id,
+                    'username': user.username,
+                    'date_created': user.date_created,
+                    'date_modified': user.date_modified
+                })
+                return make_response(profile), 200
+        else:
+            # user is not authenticated send error message
+            message = user_id
+            response = {
+                'message': message
+            }
+            # reurn an anouthorized message
+            return make_response(jsonify(response)), 401
 @shoppinglist_bp.route('/shoppinglists/', methods=['POST', 'GET'])
 def shoppinglists_view():
     # Get the access token from header
@@ -568,15 +631,24 @@ def buddies_view():
             else:
                 buddies = Buddy.query.filter_by(parent=user_id).all()
                 response = []
-                for b in buddies:
-                    user = User.query.filter_by(id=b.friend_id).first()
-                    friend = {
-                        'username': user.username,
-                        'friend_id': user.id
-                    }
-                    response.append(friend)
-                # return success
-                return make_response(jsonify(result=response)), 201
+                try:
+                    for b in buddies:
+                        user = User.query.filter_by(id=b.friend_id).first()
+                        friend = {
+                            'username': user.username,
+                            'friend_id': user.id
+                        }
+                        response.append(friend)
+                    # return success
+                    return make_response(jsonify(result=response)), 201
+                except Exception as e:
+                     response = {
+                         'error': str(e),
+                         'message': 'error'
+
+                     }
+                     #return using code 500 internal server error
+                     return make_response(jsonify(response)), 500
         else:
             # user is not authenticated send error message
             message = user_id

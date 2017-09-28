@@ -35,6 +35,11 @@ class User(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        """Deletes a passed user."""
+        db.session.delete(self)
+        db.session.commit()
+
     def generate_token(self, user_id):
         """ Generating authorization token"""
 
