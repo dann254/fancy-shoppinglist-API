@@ -640,7 +640,7 @@ def buddies_view():
                         }
                         response.append(friend)
                     # return success
-                    return make_response(jsonify(result=response)), 201
+                    return make_response(jsonify(result=response)), 200
                 except Exception as e:
                      response = {
                          'error': str(e),

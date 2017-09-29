@@ -1,0 +1,647 @@
+swagger: '2.0'
+info:
+  description: >-
+    This is an innovative shopping list app that allows users to record and
+    share things they want to spend money on. The app keeps track of their
+    shopping lists
+  version: 1.0.0
+  title: fancy shoppinglist API
+  license:
+    name: MIT License
+    url: 'https://github.com/dann254/fancy-shoppinglist-API/blob/master/LICENSE'
+tags:
+  - name: public
+    description: Accessible by anyone
+  - name: private
+    description: 'Need authentication tokens ( key:Auth, Value:Bearer TOKEN )'
+paths:
+  /:
+    get:
+      tags:
+        - public
+      summary: welcome message
+      description: Displays welcome message
+      responses:
+        '200':
+          description: app works fine
+  /auth/register:
+    post:
+      tags:
+        - public
+      summary: creates user
+      description: Registers a user to the system
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: UserData
+          description: user to create
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '201':
+          description: user registered
+        '401':
+          description: 'invalid username, short password'
+        '409':
+          description: user already exists
+  /auth/login:
+    post:
+      tags:
+        - public
+      summary: logs in the user
+      description: Generates a login token for a user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: UserData
+          description: user data to login
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: successfully logged in
+        '401':
+          description: invalid username or password
+  /user/:
+    get:
+      tags:
+        - private
+      summary: shows user profile
+      description: View user data of a registered and logged in user
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: user returned
+        '401':
+          description: invalid username or password
+    put:
+      tags:
+        - private
+      summary: edit username
+      description: Edit a user data
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: body
+          name: UserEdit
+          description: new username
+          required: true
+          schema:
+            $ref: '#/definitions/UserEdit'
+      responses:
+        '200':
+          description: user updated
+        '401':
+          description: not updated
+    delete:
+      tags:
+        - private
+      summary: delete user account
+      description: Delete user from the user
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: user deleted
+  /shoppinglists/:
+    post:
+      tags:
+        - private
+      summary: creates shoppinglist
+      description: Creates a shoppinglist using a name
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: body
+          name: Shoppinglist
+          description: shoppinglist name
+          required: true
+          schema:
+            $ref: '#/definitions/Shoppinglist'
+      responses:
+        '201':
+          description: successfully created
+        '401':
+          description: 'invalid shoppinglist name, shoppinglist already exists.'
+    get:
+      tags:
+        - private
+      summary: gets shoppinglists
+      description: gets shoppinglists for a user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: query
+          name: q
+          description: searching parameter
+          type: string
+        - in: query
+          name: start
+          description: pagination limit value
+          type: number
+        - in: query
+          name: limit
+          description: pagination start value
+          type: number
+      responses:
+        '200':
+          description: shoppinglists returned
+        '401':
+          description: invalid parameters.
+  '/shoppinglists/{list_id}':
+    get:
+      tags:
+        - private
+      summary: gets shoppinglist
+      description: returns a given shopinglists for the user
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shoppinglist
+          required: true
+          type: number
+      responses:
+        '200':
+          description: shoppinglists returned
+        '401':
+          description: 'invalid parameters, anouthorized.'
+    put:
+      tags:
+        - private
+      summary: updates shoppinglist
+      description: Updates a shoppinglist name
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shoppinglist
+          required: true
+          type: number
+        - in: body
+          name: NewShoppinglist
+          description: new shoppinglist name
+          required: true
+          schema:
+            $ref: '#/definitions/NewShoppinglist'
+      responses:
+        '201':
+          description: successfully updated
+        '401':
+          description: 'invalid shoppinglist name, shoppinglist already exists.'
+    delete:
+      tags:
+        - private
+      summary: deletes shoppinglist
+      description: Deletes a given shoppinglist
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shoppinglist
+          required: true
+          type: number
+      responses:
+        '200':
+          description: successfully deleted
+  '/shoppinglists/share/{list_id}':
+    put:
+      tags:
+        - private
+      summary: shares shoppinglist
+      description: Updates a shoppinglist share status
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shoppinglist
+          required: true
+          type: number
+      responses:
+        '200':
+          description: share status changed
+  '/shoppinglists/{list_id}/items/':
+    post:
+      tags:
+        - private
+      summary: creates item on shoppinglist
+      description: 'Creates a shoppinglist items using a name, price and quantity'
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shoppinglist
+          required: true
+          type: number
+        - in: body
+          name: Shoppinglist
+          description: shoppinglist name
+          required: true
+          schema:
+            $ref: '#/definitions/Item'
+      responses:
+        '201':
+          description: successfully created
+        '401':
+          description: 'invalid shoppinglist name, shoppinglist already exists.'
+    get:
+      tags:
+        - private
+      summary: gets items in shoppinglists
+      description: gets all items for a shoppinglist
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shoppinglist
+          required: true
+          type: number
+      responses:
+        '200':
+          description: shoppinglists returned
+        '401':
+          description: 'invalid parameters, anouthorized.'
+  '/shoppinglists/{list_id}/items/{item_id}':
+    get:
+      tags:
+        - private
+      summary: gets item by id
+      description: Returns items for the shoppinglist by id
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shoppinglist
+          required: true
+          type: number
+        - in: path
+          name: item_id
+          description: passed in id for item
+          required: true
+          type: number
+      responses:
+        '200':
+          description: item returned
+        '401':
+          description: anouthorized.
+    put:
+      tags:
+        - private
+      summary: updates item
+      description: Updates item values
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shoppinglist
+          required: true
+          type: number
+        - in: path
+          name: item_id
+          description: passed in id for item
+          required: true
+          type: number
+        - in: body
+          name: NewItem
+          description: new Item Values
+          required: true
+          schema:
+            $ref: '#/definitions/NewItem'
+      responses:
+        '200':
+          description: successfully updated
+        '401':
+          description: 'invalid item values, anouthorized.'
+    delete:
+      tags:
+        - private
+      summary: deletes item
+      description: Deletes a given item
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shoppinglist
+          required: true
+          type: number
+        - in: path
+          name: item_id
+          description: passed in id for item
+          required: true
+          type: number
+      responses:
+        '200':
+          description: successfully deleted
+  /buddies/:
+    post:
+      tags:
+        - private
+      summary: inviting buddies
+      description: adds an existing user as friend( requires multiple registered users )
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: body
+          name: Buddy
+          description: buddy username to invite
+          required: true
+          schema:
+            $ref: '#/definitions/Buddy'
+      responses:
+        '201':
+          description: successfully invited
+        '401':
+          description: 'adding self, user doesn''t exists.'
+    get:
+      tags:
+        - private
+      summary: view buddies
+      description: gets all buddies for a user
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: buddies returned
+        '401':
+          description: invalid parameters.
+  '/buddies/{friend_id}':
+    get:
+      tags:
+        - private
+      summary: gets buddy by id
+      description: Returns a single buddy by id
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: friend_id
+          description: passed in id for buddy
+          required: true
+          type: number
+      responses:
+        '200':
+          description: buddy returned
+        '401':
+          description: anouthorized.
+    delete:
+      tags:
+        - private
+      summary: unfriend buddy
+      description: Deletes a user from buddy list
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: friend_id
+          description: passed in id for buddy
+          required: true
+          type: number
+      responses:
+        '200':
+          description: successfully deleted
+  /buddies/shoppinglists/:
+    get:
+      tags:
+        - private
+      summary: gets buddy shoppinglists
+      description: Returns all shared shoppinglists from friends
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: shoppinglists returned
+        '401':
+          description: anouthorized.
+  '/buddies/shoppinglists/{list_id}':
+    get:
+      tags:
+        - private
+      summary: gets items from shared lists
+      description: Returns all items from shared shoppinglists
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Auth
+          description: 'an authorization header( Value:Bearer TOKEN )'
+          required: true
+          type: string
+        - in: path
+          name: list_id
+          description: passed in id for shared shoppinglist
+          required: true
+          type: number
+      responses:
+        '200':
+          description: shoppinglist returned
+        '401':
+          description: anouthorized.
+definitions:
+  User:
+    type: object
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+        example: johndoe
+      password:
+        type: string
+        example: randompassword
+  UserEdit:
+    type: object
+    required:
+      - username
+    properties:
+      username:
+        type: string
+        example: janedoe
+  Buddy:
+    type: object
+    required:
+      - username
+    properties:
+      username:
+        type: string
+        example: simonpeter
+  Shoppinglist:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        example: kitchenware
+  Item:
+    type: object
+    required:
+      - name
+      - price
+      - quantity
+    properties:
+      name:
+        type: string
+        example: spoon
+      price:
+        type: number
+        example: 50
+      quantity:
+        type: number
+        example: 5
+  NewItem:
+    type: object
+    properties:
+      name:
+        type: string
+        example: fork
+      price:
+        type: number
+        example: 40
+      quantity:
+        type: number
+        example: 1
+  NewShoppinglist:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        example: back to school
+host: '127.0.0.1:5000'
+schemes:
+  - http

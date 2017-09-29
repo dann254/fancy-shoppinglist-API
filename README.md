@@ -25,3 +25,37 @@ This is an innovative shopping list app that allows users to record and share th
 
 # Running the app
   1. `python run.py`
+  2. For endpoints that require tokens user Key:`Auth`, Value:`Bearer TOKEN`
+
+#Swagger documentation
+  ![View documentation](https://app.swaggerhub.com/apis/dann254/fancy-shoppinglist-API/1.0.0 "")
+
+# Hosted on heroku
+  https://fancy-shoppinglist-api.herokuapp.com/
+
+#### API Endpoints
+
+  | URL                                              | Methods | Description              | Requires Token |
+  |--------------------------------------------------|---------|--------------------------|----------------|
+  | /auth/register/                                  | POST    | registering a user       | FALSE          |
+  | /auth/login/                                     | POST    | User login               | FALSE          |
+  | /user/                                           | GET     | Get user profile         | TRUE           |
+  | /user/                                           | PUT     | Edit username            | TRUE           |
+  | /user/                                           | DELETE  | Delete a user account    | TRUE           |
+  | /shoppinglists/                                  | POST    | Creates shoppinglist     | TRUE           |
+  | /shoppinglists/                                  | GET     | Gets all shoppinglists   | TRUE           |
+  | /shoppinglists/<int:list_id>                     | PUT     | Edit a shoppinglist name | TRUE           |
+  | /shoppinglists/<int:list_id>                     | DELETE  | Delete a shoppinglist    | TRUE           |
+  | /shoppinglists/<int:list_id>                     | GET     | Get a shoppinglist by id | TRUE           |
+  | /shoppinglists/share/<int:list_id>               | PUT     | Change share status      | TRUE           |
+  | /shoppinglists/<int:list_id>/items/              | POST    | Create an item           | TRUE           |
+  | /shoppinglists/<int:list_id>/items/              | GET     | Get shoppinglist items   | TRUE           |
+  | /shoppinglists/<int:list_id>/items/<int:item_id> | PUT     | Edit an item             | TRUE           |
+  | /shoppinglists/<int:list_id>/items/<int:item_id> | DELETE  | Delete an item           | TRUE           |
+  | /shoppinglists/<int:list_id>/items/<int:item_id> | GET     | Get an item by id        | TRUE           |
+  | /buddies/                                        | GET     | Get all buddies          | TRUE           |
+  | /buddies/                                        | POST    | Invite a buddy           | TRUE           |
+  | /buddies/<int:friend_id>                         | GET     | Get buddy by id          | TRUE           |
+  | /buddies/<int:friend_id>                         | DELETE  | Unfriend a buddy         | TRUE           |
+  | /buddies/shoppinglists/                          | GET     | Get shared shoppinglists | TRUE           |
+  | /buddies/shoppinglists/<int:list_id>             | GET     | view items of shared list| TRUE           |

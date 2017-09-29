@@ -1,6 +1,6 @@
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_cors import CORS
 from instance.config import app_config
 from flask import request, jsonify, abort
 # initialize sqlalchemy
@@ -12,13 +12,18 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
+    #add extension for handling Cross Origin Resource Sharing (CORS)
+    CORS(app)
 
     #import the blueprints and register them on the app
     from app.views import auth_bp, shoppinglist_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(shoppinglist_bp)
 
-
+    #documentation
+    @app.route('/docs', methods=['GET'])
+    def docs():
+        return jsonify({'documentation':'https://app.swaggerhub.com/apis/dann254/fancy-shoppinglist-API/1.0.0', 'info':'View in browser'})
     #custom error messages
     @app.errorhandler(404)
     def not_found(error=None):
