@@ -28,7 +28,7 @@ This is an innovative shopping list app that allows users to record and share th
   2. For endpoints that require tokens user Key:`Auth`, Value:`Bearer TOKEN`
 
 # Swagger documentation
-  ![View documentation](https://app.swaggerhub.com/apis/dann254/fancy-shoppinglist-API/1.0.0 "")
+  [View documentation](https://app.swaggerhub.com/apis/dann254/fancy-shoppinglist-API/1.0.0)
 
 # Hosted on heroku
   https://fancy-shoppinglist-api.herokuapp.com/
