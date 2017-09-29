@@ -1,7 +1,6 @@
 import unittest
 import json
 from app import create_app, db
-import urllib
 
 class ShoppinglistTest(unittest.TestCase):
     """This class is a test case for shoppinglist"""
