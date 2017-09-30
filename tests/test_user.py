@@ -43,7 +43,7 @@ class ShoppinglistTest(unittest.TestCase):
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().get(
             self.user_route,
-            headers=dict(Auth="Bearer " + access_token))
+            headers=dict(Auth=access_token))
         # assert that the user is returned
         self.assertEqual(result.status_code, 200)
         self.assertIn('thisuser', str(result.data))
@@ -55,14 +55,14 @@ class ShoppinglistTest(unittest.TestCase):
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().get(
             self.user_route,
-            headers=dict(Auth="Bearer " + access_token))
+            headers=dict(Auth=access_token))
         # assert that the user is returned
         self.assertEqual(result.status_code, 200)
         self.assertIn('thisuser', str(result.data))
 
         # edit the user
         edit_reqst = self.client().put(self.user_route,
-            headers=dict(Auth="Bearer " + access_token),
+            headers=dict(Auth=access_token),
             data={
                 "username": "ouruser"
             })
@@ -71,11 +71,11 @@ class ShoppinglistTest(unittest.TestCase):
 
         # return account and confirm edit.
         edit_results = self.client().get(self.user_route,
-            headers=dict(Auth="Bearer " + access_token))
+            headers=dict(Auth=access_token))
         self.assertIn('ouruser', str(edit_results.data))
 
         # delete the user
-        delete_reqst = self.client().delete(self.user_route, headers=dict(Auth="Bearer " + access_token))
+        delete_reqst = self.client().delete(self.user_route, headers=dict(Auth=access_token))
         self.assertEqual(delete_reqst.status_code, 200)
 
 if __name__ == "__main__":

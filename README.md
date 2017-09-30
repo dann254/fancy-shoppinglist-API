@@ -25,7 +25,7 @@ This is an innovative shopping list app that allows users to record and share th
 
 # Running the app
   1. `python run.py`
-  2. For endpoints that require tokens user Key:`Auth`, Value:`Bearer TOKEN`
+  2. For endpoints that require tokens user Key:`Auth`, Value:`TOKEN`
 
 # Swagger documentation
   [View documentation](https://app.swaggerhub.com/apis/dann254/fancy-shoppinglist-API/1.0.0)

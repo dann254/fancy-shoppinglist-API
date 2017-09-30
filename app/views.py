@@ -97,7 +97,7 @@ def login():
 def user_profile():
     # get the access token from  header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
         # Get the user id in token
@@ -154,7 +154,7 @@ def user_profile():
 def shoppinglists_view():
     # Get the access token from header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
      # decode the token and get the user_id
@@ -311,7 +311,7 @@ def shoppinglists_view():
 def shoppinglist_manipulation(list_id, **kwargs):
     # get the access token from  header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
         # Get the user id in token
@@ -378,7 +378,7 @@ def shoppinglist_manipulation(list_id, **kwargs):
 def shoppinglist_share(list_id, **kwargs):
     # get the access token from  header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
         # Get the user id in token
@@ -435,7 +435,7 @@ def shoppinglist_share(list_id, **kwargs):
 def items_view(list_id):
     # Get the access token from header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
      # decode the token and get the user_id
@@ -506,7 +506,7 @@ def items_view(list_id):
 def item_manipulation(list_id, item_id, **kwargs):
     # get the access token from  header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
         # Get the user id in token
@@ -580,7 +580,7 @@ def item_manipulation(list_id, item_id, **kwargs):
 def buddies_view():
     # get the access token from  header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
         # Get the user id in token
@@ -662,7 +662,7 @@ def buddies_view():
 def buddies_view_by_id(friend_id):
     # get the access token from  header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
         # Get the user id in token
@@ -706,7 +706,7 @@ def buddies_view_by_id(friend_id):
 def buddies_list_view():
     # get the access token from  header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
         # Get the user id in token
@@ -750,7 +750,7 @@ def buddies_list_view():
 def buddies_list_items_view(list_id):
     # get the access token from  header
     auth_header = request.headers.get('Auth')
-    access_token = auth_header.split(" ")[1]
+    access_token = auth_header
 
     if access_token:
         # Get the user id in token

@@ -13,7 +13,7 @@ tags:
   - name: public
     description: Accessible by anyone
   - name: private
-    description: 'Need authentication tokens ( key:Auth, Value:Bearer TOKEN )'
+    description: 'Need authentication tokens ( key:Auth, Value:TOKEN )'
 paths:
   /:
     get:
@@ -81,7 +81,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
       responses:
@@ -101,7 +101,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: body
@@ -125,7 +125,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
       responses:
@@ -144,7 +144,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: body
@@ -170,7 +170,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: query
@@ -201,7 +201,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -226,7 +226,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -255,7 +255,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -277,7 +277,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -301,7 +301,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -332,7 +332,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -356,7 +356,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -386,7 +386,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -420,7 +420,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -449,7 +449,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: body
@@ -473,7 +473,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
       responses:
@@ -492,7 +492,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -515,7 +515,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
@@ -537,7 +537,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
       responses:
@@ -556,7 +556,7 @@ paths:
       parameters:
         - in: header
           name: Auth
-          description: 'an authorization header( Value:Bearer TOKEN )'
+          description: 'an authorization header( Value:TOKEN )'
           required: true
           type: string
         - in: path
