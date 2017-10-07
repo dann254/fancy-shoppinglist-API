@@ -107,12 +107,12 @@ def user_profile():
             user=User.query.filter_by(id=user_id).first()
             if request.method == 'PUT':
                 # obtain a username from data
-                username = str(request.data.get('username', ''))
+                username = str(request.data.get('username', '')) if str(request.data.get('username', '')) and re.match(r"^[a-z0-9_]*$", str(request.data.get('username', ''))) else user.username
                 existing_user=User.query.all()
                 for i in existing_user:
                     if username == i.username:
                         response = {
-                            'message': 'NOT UPDATED: a user with that name already exists'
+                            'message': 'NOT UPDATED: a user with that name already exists or no username was provided'
                         }
                         return make_response(jsonify(response)), 401
                 user.username = username
