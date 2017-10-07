@@ -9,7 +9,7 @@ class BuddyTest(unittest.TestCase):
         """Initialize app and define variables"""
         self.app = create_app(config_name="testing")
         self.client = self.app.test_client
-        self.shoppinglist = {'name': 'clothes sl'}
+        self.shoppinglist = {'name': 'clothes-sl'}
         self.buddy = {'username': 'thisuser'}
         self.item = {'name':'shirt', 'price':'500', 'quantity':'5'}
         self.register_route = '/auth/register'
@@ -174,7 +174,7 @@ class BuddyTest(unittest.TestCase):
             headers=dict(Auth=access_token),
         )
         self.assertEqual(reqst.status_code, 200)
-        self.assertIn('clothes sl', str(reqst.data))
+        self.assertIn('clothes-sl', str(reqst.data))
 
     def test_view_shared_lists_items(self):
         """Test if a user can view shared lists items of invited friends"""

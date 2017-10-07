@@ -10,7 +10,7 @@ class ShoppinglistTest(unittest.TestCase):
         """Initialize app and define variables"""
         self.app = create_app(config_name="testing")
         self.client = self.app.test_client
-        self.shoppinglist = {'name': 'clothes sl'}
+        self.shoppinglist = {'name': 'clothes-sl'}
         self.item = {'name':'shirt', 'price':'500', 'quantity':'5'}
         self.register_route = '/auth/register'
         self.login_route = '/auth/login'
@@ -54,7 +54,7 @@ class ShoppinglistTest(unittest.TestCase):
             headers=dict(Auth=str(access_token)),
             data=self.shoppinglist)
         self.assertEqual(reqst.status_code, 201)
-        self.assertIn('clothes sl', str(reqst.data))
+        self.assertIn('clothes-sl', str(reqst.data))
 
     def test_get_all_shoppinglists(self):
         """Test GET request for shoppinglists."""
@@ -73,7 +73,7 @@ class ShoppinglistTest(unittest.TestCase):
             headers=dict(Auth=access_token),
         )
         self.assertEqual(reqst.status_code, 200)
-        self.assertIn('clothes sl', str(reqst.data))
+        self.assertIn('clothes-sl', str(reqst.data))
 
     def test_get_shoppinglist_by_id(self):
         """Test get a single shoppinglist by using it's id."""
@@ -95,7 +95,7 @@ class ShoppinglistTest(unittest.TestCase):
             headers=dict(Auth=access_token))
         # assert that the shoppinglist is actually returned given its ID
         self.assertEqual(result.status_code, 200)
-        self.assertIn('clothes sl', str(result.data))
+        self.assertIn('clothes-sl', str(result.data))
 
     def test_shoppinglist_can_be_edited(self):
         """Test edit an existing shoppinglist. PUT"""
@@ -116,14 +116,14 @@ class ShoppinglistTest(unittest.TestCase):
         reqst = self.client().put(self.shoppinglist_route + '{}'.format(results['id']),
             headers=dict(Auth=access_token),
             data={
-                "name": "Clothes and Foodstuff"
+                "name": "Clothes-and-Foodstuff"
             })
         self.assertEqual(reqst.status_code, 200)
 
         # return the edited list and confirm edit.
         results = self.client().get(self.shoppinglist_route + '{}'.format(results['id']),
             headers=dict(Auth=access_token))
-        self.assertIn('Foodstuff', str(results.data))
+        self.assertIn('Clothes-and-Foodstuff', str(results.data))
 
     def test_shoppinglist_delete(self):
         """Test deletetion an existing shoppinglist."""
@@ -248,7 +248,7 @@ class ShoppinglistTest(unittest.TestCase):
             headers=dict(Auth=access_token))
         # assert that the shoppinglist is actually returned given its ID
         self.assertEqual(result.status_code, 200)
-        self.assertIn('clothes sl', str(result.data))
+        self.assertIn('clothes-sl', str(result.data))
 
         #create an item
         item_reqst = self.client().post(self.shoppinglist_route + '{}'.format(results['id'])+'/items/' ,

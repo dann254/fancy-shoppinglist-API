@@ -641,7 +641,7 @@ definitions:
     properties:
       name:
         type: string
-        example: back to school
+        example: back-to-school
 host: '127.0.0.1:5000'
 schemes:
   - http
