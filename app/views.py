@@ -171,7 +171,7 @@ def shoppinglists_view():
                         return make_response(jsonify(response)), 401
                     existing_list=Shoppinglist.query.filter_by(owned_by=user_id).all()
                     for i in existing_list:
-                        if name == i.name:
+                        if name.lower() == i.name.lower():
                             response = {
                                 'message': 'shoppinglist already exists'
                             }
@@ -461,7 +461,7 @@ def items_view(list_id):
                             return make_response(jsonify(response)), 401
                         existing_item=Item.query.filter_by(belongs_to=list_id).all()
                         for i in existing_item:
-                            if name == i.name:
+                            if name.lower() == i.name.lower():
                                 response = {
                                     'message': 'item with that name already exists'
                                 }
