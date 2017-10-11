@@ -43,11 +43,6 @@ class AuthTest(unittest.TestCase):
         second_reqst = self.client().post(self.register_route, data=self.user_data)
         self.assertEqual(second_reqst.status_code, 409)
 
-    def test_confirm_email(self):
-        """Test if a user can confirm email"""
-        self.client().post(self.register_route, data=self.user_data)
-        request = self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
-        self.assertEqual(request.status_code, 200)
     def test_user_login(self):
         """Test if the registered user can login"""
         reqst = self.client().post(self.register_route, data=self.user_data)
