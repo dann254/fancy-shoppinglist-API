@@ -30,9 +30,9 @@ class User(db.Model):
         self.password = Bcrypt().generate_password_hash(password).decode()
         self.confirmed = confirmed
 
-    def validate_password(self, password):
+    def validate_password(self, ppassword):
         """validates user password using Bcrypt"""
-        return Bcrypt().check_password_hash(self.password, password)
+        return Bcrypt().check_password_hash(self.password, ppassword)
 
     def save(self):
         """Save a user to the database.(creating and editing)."""

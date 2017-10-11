@@ -1,9 +1,10 @@
 from flask import make_response, request, jsonify, Blueprint, abort
 
+from flask_bcrypt import Bcrypt
 from app.models import User, Shoppinglist, Item, Buddy
 import re
 from app import mail
-from app.email_handler import handler, decode_token
+from app.email_handler import handler, decode_token,reset_handler
 
 # Define the blueprints
 auth_bp = Blueprint('auth', __name__)
@@ -108,6 +109,115 @@ def verify_email(token):
         'message': 'email confirmed. you can now login'
         }
         return make_response(jsonify(response)), 200
+
+@auth_bp.route('/auth/resend_confirmation', methods=['POST'])
+def resend_confirm():
+    email = request.data['email'] if request.data['email'] else None
+    if email:
+        if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+            message = "please enter a valid email adress"
+            response = {
+                'message': message
+            }
+            return make_response(jsonify(response)), 401
+        else:
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                response = {
+                    'message': 'You do not have an account on fancy shoppinglist, Please register to continue'
+                }
+                return make_response(jsonify(response)), 401
+            if user.confirmed == True:
+                response = {
+                    'message': 'Your account is already confirmed, please login'
+                }
+                return make_response(jsonify(response)), 401
+            handler(email)
+            response = {
+                'message': 'Comfirm your account using the link sent to your email'
+            }
+            return make_response(jsonify(response)), 200
+    else:
+        #the user hasnt entered an email
+        response = {
+            'message': 'please enter an email.'
+        }
+        # return message with code 401
+        return make_response(jsonify(response)), 401
+
+
+@auth_bp.route('/auth/forgot_password', methods=['POST'])
+def forgot_password():
+    email = request.data['email'] if request.data['email'] else None
+    if email:
+        if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+            message = "please enter a valid email adress"
+            response = {
+                'message': message
+            }
+            return make_response(jsonify(response)), 401
+        else:
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                response = {
+                    'message': 'You do not have an account on fancy shoppinglist, Please register to continue'
+                }
+                return make_response(jsonify(response)), 401
+            if user.confirmed == False:
+                response = {
+                    'message': 'please confirm your account',
+                    'link': '/auth/resend_confirmation'
+                }
+                return make_response(jsonify(response)), 401
+            reset_handler(email)
+            response = {
+                'message': 'A reset password link has been sent to your email adress'
+            }
+            return make_response(jsonify(response)), 200
+    else:
+        #the user hasnt entered an email
+        response = {
+            'message': 'please enter an email.'
+        }
+        # return message with code 401
+        return make_response(jsonify(response)), 401
+
+@auth_bp.route('/auth/reset_password/<token>', methods=['POST'])
+def reset_password(token):
+    email = decode_token(token)
+
+    if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+        message = email
+        response = {
+            'message': message
+        }
+        return make_response(jsonify(response)), 401
+
+    else:
+        if request.method == 'POST':
+
+            new_password = request.data['password'] if request.data['password'] else None
+            if new_password:
+                user = User.query.filter_by(email=email).first()
+                if not user:
+                    response = {
+                        'message': 'You do not have an account on fancy shoppinglist, Please register to continue'
+                    }
+                    return make_response(jsonify(response)), 401
+                user.password = Bcrypt().generate_password_hash(new_password).decode()
+                user.save()
+                response = {
+                'message': 'password updated, you can now login'
+                }
+                return make_response(jsonify(response)), 200
+            else:
+                #the user hasnt entered a new password
+                response = {
+                    'message': 'please enter a new password.'
+                }
+                # return message with code 401
+                return make_response(jsonify(response)), 401
+
 #handle login
 @auth_bp.route('/auth/login', methods=['POST'])
 def login():
