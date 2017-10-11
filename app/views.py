@@ -3,7 +3,6 @@ from flask import make_response, request, jsonify, Blueprint, abort
 from flask_bcrypt import Bcrypt
 from app.models import User, Shoppinglist, Item, Buddy
 import re
-from app import mail
 from app.email_handler import handler, decode_token,reset_handler
 
 # Define the blueprints
