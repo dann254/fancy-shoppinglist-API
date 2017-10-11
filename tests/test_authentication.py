@@ -1,6 +1,7 @@
 import unittest
 import json
 from app import create_app, db
+from app.email_handler import generate_token
 
 class AuthTest(unittest.TestCase):
     """Test authentication: login and register"""
@@ -14,11 +15,14 @@ class AuthTest(unittest.TestCase):
         # user test json with predifined variables
         self.user_data = {
             'username': 'thisuser',
-            'password': 'mypassword'
+            'password': 'mypassword',
+            'email': 'email@mail.com'
         }
+        self.confirm_token=generate_token("email@mail.com")
         #initialize endpoints
         self.register_route = '/auth/register'
         self.login_route = '/auth/login'
+        self.confirm_route = '/verify/'
 
         with self.app.app_context():
             #create database tables
@@ -39,10 +43,16 @@ class AuthTest(unittest.TestCase):
         second_reqst = self.client().post(self.register_route, data=self.user_data)
         self.assertEqual(second_reqst.status_code, 409)
 
+    def test_confirm_email(self):
+        """Test if a user can confirm email"""
+        self.client().post(self.register_route, data=self.user_data)
+        request = self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
+        self.assertEqual(request.status_code, 200)
     def test_user_login(self):
         """Test if the registered user can login"""
         reqst = self.client().post(self.register_route, data=self.user_data)
         self.assertEqual(reqst.status_code, 201)
+        self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
         login_reqst = self.client().post(self.login_route, data=self.user_data)
         #get jsonified result and test if it  returns 200 status
         result = json.loads(login_reqst.data.decode())

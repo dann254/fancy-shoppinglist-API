@@ -2,6 +2,7 @@ import unittest
 import json
 from app import create_app, db
 import urllib
+from app.email_handler import generate_token
 
 class ShoppinglistTest(unittest.TestCase):
     """This class is a test case for shoppinglist"""
@@ -17,6 +18,8 @@ class ShoppinglistTest(unittest.TestCase):
         self.shoppinglist_route = '/shoppinglists/'
         self.share_route = '/shoppinglists/share/'
         self.search_route = '/shoppinglists/'
+        self.confirm_token=generate_token("email@mail.com")
+        self.confirm_route = '/verify/'
 
 
         # binds the app to the current context
@@ -26,10 +29,11 @@ class ShoppinglistTest(unittest.TestCase):
             db.drop_all()
             db.create_all()
 
-    def register_user(self, username="thisuser", password="userpassword"):
+    def register_user(self, username="thisuser", password="userpassword", email='email@mail.com'):
         user_data = {
             'username': username,
-            'password': password
+            'password': password,
+            'email': email
         }
         return self.client().post(self.register_route, data=user_data)
 
@@ -38,6 +42,7 @@ class ShoppinglistTest(unittest.TestCase):
             'username': username,
             'password': password
         }
+        self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
         return self.client().post(self.login_route, data=user_data)
     def create_shoppinglist(self,access_token):
         return self.client().post(self.shoppinglist_route,

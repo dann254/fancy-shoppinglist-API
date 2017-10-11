@@ -11,8 +11,10 @@ class User(db.Model):
 
     # table collumns
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(256), nullable=False, unique=True)
+    username = db.Column(db.String(), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
+    email = db.Column(db.String(), nullable=False, unique=True)
+    confirmed = db.Column(db.Boolean(), nullable=False, server_default='0')
     buddy = db.relationship(
         'Buddy', order_by='Buddy.id', cascade="all, delete-orphan")
     shoppinglist = db.relationship(
@@ -20,11 +22,13 @@ class User(db.Model):
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-    def __init__(self, username, password):
+    def __init__(self, username, email, password, confirmed=None):
         """Initialize user's username and password."""
         self.username = username
+        self.email = email
         #encrypt password using Bcrypt
         self.password = Bcrypt().generate_password_hash(password).decode()
+        self.confirmed = confirmed
 
     def validate_password(self, password):
         """validates user password using Bcrypt"""

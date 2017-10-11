@@ -3,8 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from instance.config import app_config
 from flask import request, jsonify, abort
+from flask_mail import Mail
 # initialize sqlalchemy
 db = SQLAlchemy()
+mail = Mail()
 
 def create_app(config_name):
     app = FlaskAPI(__name__, instance_relative_config=True)
@@ -14,6 +16,7 @@ def create_app(config_name):
     db.init_app(app)
     #add extension for handling Cross Origin Resource Sharing (CORS)
     CORS(app)
+    mail.init_app(app)
 
     #import the blueprints and register them on the app
     from app.views import auth_bp, shoppinglist_bp

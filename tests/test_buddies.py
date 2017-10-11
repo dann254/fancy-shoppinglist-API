@@ -1,6 +1,7 @@
 import unittest
 import json
 from app import create_app, db
+from app.email_handler import generate_token
 
 class BuddyTest(unittest.TestCase):
     """This class is a test case for buddies"""
@@ -13,8 +14,11 @@ class BuddyTest(unittest.TestCase):
         self.buddy = {'username': 'thisuser'}
         self.item = {'name':'shirt', 'price':'500', 'quantity':'5'}
         self.register_route = '/auth/register'
+        self.confirm_token=generate_token("email@mail.com")
+        self.confirm_token_two=generate_token("email2@mail.com")
         self.login_route = '/auth/login'
         self.buddies_route = '/buddies/'
+        self.confirm_route = '/verify/'
         self.buddies_list_route = '/buddies/shoppinglists/'
         self.shoppinglist_route = '/shoppinglists/'
         self.share_route = '/shoppinglists/share/'
@@ -28,17 +32,19 @@ class BuddyTest(unittest.TestCase):
             db.drop_all()
             db.create_all()
 
-    def register_user(self, username="thisuser", password="userpassword"):
+    def register_user(self, username="thisuser", password="userpassword", email="email@mail.com"):
         user_data = {
             'username': username,
-            'password': password
+            'password': password,
+            'email': email
         }
         return self.client().post(self.register_route, data=user_data)
 
-    def register_user_two(self, username="thatuser", password="userpassword"):
+    def register_user_two(self, username="thatuser", password="userpassword",email="email2@mail.com"):
         user_data = {
             'username': username,
-            'password': password
+            'password': password,
+            'email': email
         }
         return self.client().post(self.register_route, data=user_data)
 
@@ -47,12 +53,14 @@ class BuddyTest(unittest.TestCase):
             'username': username,
             'password': password
         }
+        self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
         return self.client().post(self.login_route, data=user_data)
     def login_user_two(self, username="thatuser", password="userpassword"):
         user_data = {
             'username': username,
             'password': password
         }
+        self.client().get(self.confirm_route + '{}'.format(self.confirm_token_two))
         return self.client().post(self.login_route, data=user_data)
     def create_shoppinglist(self,access_token):
         return self.client().post(self.shoppinglist_route,

@@ -2,6 +2,8 @@ from flask import make_response, request, jsonify, Blueprint, abort
 
 from app.models import User, Shoppinglist, Item, Buddy
 import re
+from app import mail
+from app.email_handler import handler, decode_token
 
 # Define the blueprints
 auth_bp = Blueprint('auth', __name__)
@@ -17,50 +19,95 @@ def home():
 #route only takes post method and handles register
 @auth_bp.route('/auth/register', methods = ['POST'])
 def register():
-    # check if the user already exists
-    user = User.query.filter_by(username=request.data['username']).first()
-    if not user:
-        #the user doesnt exist so try to register them
-        try:
-            post_data = request.data
-            username = post_data['username']
-            password = post_data['password']
-            username = username.lower()
-            if not re.match(r"^[a-z0-9_]*$", username):
-                response = {
-                    'message': 'please enter a valid username'
-                }
-                return make_response(jsonify(response)), 401
-            if len(password)<6:
-                response = {
-                    'message': 'password must be at least 6 characters long'
-                }
-                return make_response(jsonify(response)), 401
-            user = User(username=username, password=password)
-            user.save()
+    post_data = request.data
+    username = post_data['username'] if post_data['username'] else None
+    password = post_data['password'] if post_data['password'] else None
+    email = post_data['email'] if post_data['email'] else None
+    if username and password and email:
+        # check if the user already exists
+        user = User.query.filter_by(username=username).first()
+        useremail = User.query.filter_by(email=email).first()
+        if not user and not useremail:
+            #the user doesnt exist so try to register them
+            try:
 
-            response = {
-                'message': 'You registered successfully. you can now login'
-            }
-            #return a response for a successful register with code 201 - created
-            return make_response(jsonify(response)), 201
+                username = username.lower()
+                email = email.lower()
+                if not re.match(r"^[a-z0-9_]*$", username):
+                    response = {
+                        'message': 'please enter a valid username'
+                    }
+                    return make_response(jsonify(response)), 401
+                if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+                    response = {
+                        'message': 'please enter a valid email address'
+                    }
+                    return make_response(jsonify(response)), 401
+                if len(password)<6:
+                    response = {
+                        'message': 'password must be at least 6 characters long'
+                    }
+                    return make_response(jsonify(response)), 401
+                email_sent=handler(email)
+                if email_sent != "":
+                    pass
+                else:
+                    emails = {
+                        'message': 'email not sent'
+                    }
+                    return make_response(jsonify(emails)), 401
+                user = User(username=username,email=email, password=password)
+                user.save()
 
-        except Exception as e:
-            #return error message if an exception occurs while trying to register user
+                response = {
+                    'message': 'You registered successfully. Comfirm your account using the link sent to your email'
+                }
+                #return a response for a successful register with code 201 - created
+                return make_response(jsonify(response)), 201
+
+            except Exception as e:
+                #return error message if an exception occurs while trying to register user
+                response = {
+                    'message': str(e)
+                }
+                #include the code 500-server error
+                return make_response(jsonify(response)), 500
+
+        else:
+            #the user already exists
             response = {
-                'message': str(e)
+                'message': 'username already exists'
             }
-            #include the code 500-server error
-            return make_response(jsonify(response)), 500
+            # return message with code 409 - conflict
+            return make_response(jsonify(response)), 409
+    else:
+        #the user hasnt enteres all required fields
+        response = {
+            'message': 'please input all the required data.'
+        }
+        # return message with code 401
+        return make_response(jsonify(response)), 401
+
+#handle email verification
+@auth_bp.route('/verify/<token>', methods=['GET'])
+def verify_email(token):
+    email = decode_token(token)
+
+    if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+        message = email
+        response = {
+            'message': message
+        }
+        return make_response(jsonify(response)), 401
 
     else:
-        #the user already exists
+        user = User.query.filter_by(email=email).first()
+        user.confirmed = True
+        user.save()
         response = {
-            'message': 'username already exists'
+        'message': 'email confirmed. you can now login'
         }
-        # return message with code 409 - conflict
-        return make_response(jsonify(response)), 409
-
+        return make_response(jsonify(response)), 200
 #handle login
 @auth_bp.route('/auth/login', methods=['POST'])
 def login():
