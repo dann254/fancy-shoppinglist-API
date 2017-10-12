@@ -379,9 +379,9 @@ def shoppinglists_view():
         if not isinstance(user_id, str):
             # handle requests after authentication
             if request.method == "POST":
-                name = str(request.data.get('name', ''))
+                name = str(request.data.get('name', '')).strip()
                 if name:
-                    if not re.match(r"^[a-zA-Z0-9_-]*$", name):
+                    if not re.match(r"^[a-zA-Z0-9_ -]*$", name):
                         response = {
                             'message': 'please enter a valid shoppinglist name'
                         }
@@ -556,7 +556,7 @@ def shoppinglist_manipulation(list_id, **kwargs):
 
             elif request.method == 'PUT':
                 # obtain a name from data
-                name = str(request.data.get('name', '')) if str(request.data.get('name', '')) and re.match(r"^[a-zA-Z0-9_-]*$", str(request.data.get('name', ''))) else shoppinglist.name
+                name = str(request.data.get('name', '')).strip() if str(request.data.get('name', '')) and re.match(r"^[a-zA-Z0-9_ -]*$", str(request.data.get('name', ''))) and str(request.data.get('name', '')).strip() !="" else shoppinglist.name
                 existing_list=Shoppinglist.query.filter_by(owned_by=user_id).all()
                 for i in existing_list:
                     if name == i.name:
@@ -667,11 +667,11 @@ def items_view(list_id):
             shoppinglist = Shoppinglist.query.filter_by(id=list_id).first()
             if shoppinglist.owned_by == user_id:
                 if request.method == "POST":
-                    name = str(request.data.get('name', ''))
+                    name = str(request.data.get('name', '')).strip()
                     price = request.data.get('price', '') if re.match(r"^[0-9]*$", request.data.get('price', '')) else None
                     quantity = request.data.get('quantity', '') if re.match(r"^[0-9]*$", request.data.get('quantity', '')) else None
                     if name and price and quantity:
-                        if not re.match(r"^[a-zA-Z0-9_-]*$", name):
+                        if not re.match(r"^[a-zA-Z0-9_ -]*$", name):
                             response = {
                                 'message': 'please enter a valid item name'
                             }
@@ -756,7 +756,7 @@ def item_manipulation(list_id, item_id, **kwargs):
 
             elif request.method == 'PUT':
                 #obtain updates from data if not, use the existing
-                name = str(request.data.get('name', '')) if str(request.data.get('name', '')) and re.match(r"^[a-zA-Z0-9_-]*$", str(request.data.get('name', ''))) else item.name
+                name = str(request.data.get('name', '')).strip if str(request.data.get('name', '')) and re.match(r"^[a-zA-Z0-9_ -]*$", str(request.data.get('name', ''))) and str(request.data.get('name', '')).strip != "" else item.name
                 price = str(request.data.get('price', '')) if str(request.data.get('price', '')) and re.match(r"^[0-9]*$", str(request.data.get('price', ''))) else item.price
                 quantity = str(request.data.get('quantity', '')) if str(request.data.get('quantity', '')) and re.match(r"^[0-9]*$", str(request.data.get('quantity', ''))) else item.quantity
 
