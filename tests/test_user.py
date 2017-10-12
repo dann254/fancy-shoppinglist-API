@@ -54,7 +54,7 @@ class ShoppinglistTest(unittest.TestCase):
         self.assertIn('thisuser', str(result.data))
 
     def test_user_can_be_edited_or_deleted(self):
-        """Test user can edit or delete account"""
+        """Test username can be edited and delete account"""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -82,6 +82,26 @@ class ShoppinglistTest(unittest.TestCase):
         # delete the user
         delete_reqst = self.client().delete(self.user_route, headers=dict(Auth=access_token))
         self.assertEqual(delete_reqst.status_code, 200)
+
+    def test_password_can_be_edited(self):
+        """Test if a user can edit their password"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        result = self.client().get(
+            self.user_route,
+            headers=dict(Auth=access_token))
+
+        # edit the user
+        edit_reqst = self.client().put(self.user_route,
+            headers=dict(Auth=access_token),
+            data={
+                "password": "userpassword",
+                "new_password": "new_password"
+            })
+
+        self.assertEqual(edit_reqst.status_code, 200)
+
 
 if __name__ == "__main__":
     unittest.main()

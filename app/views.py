@@ -38,7 +38,7 @@ def register():
                         'message': 'please enter a valid username'
                     }
                     return make_response(jsonify(response)), 401
-                if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+                if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
                     response = {
                         'message': 'please enter a valid email address'
                     }
@@ -93,7 +93,7 @@ def register():
 def verify_email(token):
     email = decode_token(token)
 
-    if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+    if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
         message = email
         response = {
             'message': message
@@ -113,7 +113,7 @@ def verify_email(token):
 def resend_confirm():
     email = request.data['email'] if request.data['email'] else None
     if email:
-        if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+        if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
             message = "please enter a valid email adress"
             response = {
                 'message': message
@@ -149,7 +149,7 @@ def resend_confirm():
 def forgot_password():
     email = request.data['email'] if request.data['email'] else None
     if email:
-        if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+        if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
             message = "please enter a valid email adress"
             response = {
                 'message': message
@@ -185,7 +185,7 @@ def forgot_password():
 def reset_password(token):
     email = decode_token(token)
 
-    if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z.]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
+    if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
         message = email
         response = {
             'message': message
@@ -264,19 +264,65 @@ def user_profile():
             if request.method == 'PUT':
                 # obtain a username from data
                 username = str(request.data.get('username', '')) if str(request.data.get('username', '')) and re.match(r"^[a-z0-9_]*$", str(request.data.get('username', ''))) else user.username
+                password = str(request.data.get('password', '')) if str(request.data.get('password', '')) else None
+                new_password = str(request.data.get('new_password', '')) if str(request.data.get('new_password', '')) else None
+                email = str(request.data.get('email', '')) if str(request.data.get('email', '')) and re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z]+$)", str(request.data.get('email', ''))) or re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", str(request.data.get('email', ''))) else user.email
                 existing_user=User.query.all()
                 for i in existing_user:
                     if username == i.username:
+                        if not str(request.data.get('username', '')):
+                            pass
+                        elif i.id==user_id:
+                            response={
+                                'message': 'You are already using that username'
+                            }
+                            return make_response(jsonify(response)), 401
+                        else:
+                            response = {
+                                'message': 'USERNAME NOT UPDATED: a user with that username already exists'
+                            }
+                            return make_response(jsonify(response)), 401
+                    if email == i.email:
+                        if not str(request.data.get('email', '')):
+                            pass
+                        elif i.id==user_id:
+                            response={
+                                'message': 'You are already using that email'
+                            }
+                            return make_response(jsonify(response)), 401
+                        else:
+                            response = {
+                                'message': 'EMAIL NOT UPDATED: a user with that email already exists'
+                            }
+                            return make_response(jsonify(response)), 401
+                if password or new_password:
+                    if password and new_password:
+                        if user.validate_password(password):
+                            if len(new_password)<6:
+                                response = {
+                                    'message': 'New password is too short'
+                                }
+                                return make_response(jsonify(response)), 401
+
+                        else:
+                            response = {
+                                'message': 'Anouthorized: the current password you entered is invalid'
+                            }
+                            return make_response(jsonify(response)), 401
+                    else:
                         response = {
-                            'message': 'NOT UPDATED: a user with that name already exists or no username was provided'
+                            'message': 'Please enter both your new and old password to change password'
                         }
                         return make_response(jsonify(response)), 401
+                    user.password = Bcrypt().generate_password_hash(new_password).decode()
                 user.username = username
+                user.email = email
                 user.save()
 
                 response = {
                     'id': user.id,
                     'username': user.username,
+                    'email': user.email,
                     'date_created': user.date_created,
                     'date_modified': user.date_modified
                 }
@@ -294,6 +340,7 @@ def user_profile():
                 profile = jsonify({
                     'id': user.id,
                     'username': user.username,
+                    'email': user.email,
                     'date_created': user.date_created,
                     'date_modified': user.date_modified
                 })
