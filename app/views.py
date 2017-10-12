@@ -222,9 +222,21 @@ def reset_password(token):
 def login():
     try:
         #find the user using their username
-        user = User.query.filter_by(username=request.data['username']).first()
-
-        if user and user.validate_password(request.data['password']):
+        username= str(request.data['username']) if str(request.data['username']) else None
+        password= str(request.data['password']) if str(request.data['password']) else None
+        if not username or not password:
+            response = {
+                'message': 'please enter all the required fields',
+            }
+            return make_response(jsonify(response)), 401
+        user = User.query.filter_by(username=username).first()
+        if user.confirmed==False:
+            response = {
+                'message': 'please verify your email before logging in',
+                'link': '/auth/resend_confirmation'
+            }
+            return make_response(jsonify(response)), 401
+        if user and user.validate_password(password):
             #generate the access token for auth header
             access_token = user.generate_token(user.id)
             if access_token:
