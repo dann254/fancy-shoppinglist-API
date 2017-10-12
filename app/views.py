@@ -268,10 +268,13 @@ def user_profile():
                 new_password = str(request.data.get('new_password', '')) if str(request.data.get('new_password', '')) else None
                 email = str(request.data.get('email', '')) if str(request.data.get('email', '')) and re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z]+$)", str(request.data.get('email', ''))) or re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", str(request.data.get('email', ''))) else user.email
                 existing_user=User.query.all()
+                em=0
+                em2=0
+                msgarray=[]
                 for i in existing_user:
                     if username == i.username:
                         if not str(request.data.get('username', '')):
-                            pass
+                            em2=1
                         elif i.id==user_id:
                             response={
                                 'message': 'You are already using that username'
@@ -284,7 +287,7 @@ def user_profile():
                             return make_response(jsonify(response)), 401
                     if email == i.email:
                         if not str(request.data.get('email', '')):
-                            pass
+                            em=1
                         elif i.id==user_id:
                             response={
                                 'message': 'You are already using that email'
@@ -295,6 +298,7 @@ def user_profile():
                                 'message': 'EMAIL NOT UPDATED: a user with that email already exists'
                             }
                             return make_response(jsonify(response)), 401
+
                 if password or new_password:
                     if password and new_password:
                         if user.validate_password(password):
@@ -315,12 +319,21 @@ def user_profile():
                         }
                         return make_response(jsonify(response)), 401
                     user.password = Bcrypt().generate_password_hash(new_password).decode()
-                user.username = username
-                user.email = email
+                    msgarray.append("Password updated")
+                if em==0:
+                    handler(email)
+                    user.confirmed=False
+                    user.email = email
+                    msgarray.append("Email updated, You will need to confirm your email account")
+                if em2==0:
+                    user.username = username
+                    msgarray.append("Username updated")
                 user.save()
 
                 response = {
+                    'message':msgarray,
                     'id': user.id,
+                    'confirmed': user.confirmed,
                     'username': user.username,
                     'email': user.email,
                     'date_created': user.date_created,
@@ -340,6 +353,7 @@ def user_profile():
                 profile = jsonify({
                     'id': user.id,
                     'username': user.username,
+                    'confirmed': user.confirmed,
                     'email': user.email,
                     'date_created': user.date_created,
                     'date_modified': user.date_modified
