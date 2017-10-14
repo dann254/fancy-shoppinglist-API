@@ -18,7 +18,7 @@ class AuthTest(unittest.TestCase):
             'password': 'mypassword',
             'email': 'email@mail.com'
         }
-        self.confirm_token=generate_token("email@mail.com")
+
         #initialize endpoints
         self.register_route = '/auth/register'
         self.login_route = '/auth/login'
@@ -29,6 +29,7 @@ class AuthTest(unittest.TestCase):
             db.session.close()
             db.drop_all()
             db.create_all()
+            self.confirm_token=generate_token("email@mail.com")
 
     def test_registration(self):
         """Test if user registration works correctly and user is saved to db"""
@@ -51,7 +52,7 @@ class AuthTest(unittest.TestCase):
         login_reqst = self.client().post(self.login_route, data=self.user_data)
         #get jsonified result and test if it  returns 200 status
         result = json.loads(login_reqst.data.decode())
-        self.assertEqual(self.confirm_token, "login success")
+        #self.assertEqual(self.confirm_token, "login success")
         self.assertEqual(login_reqst.status_code, 200)
         #check if it has an access token
         self.assertTrue(result['access_token'])

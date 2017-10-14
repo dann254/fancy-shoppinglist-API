@@ -14,7 +14,6 @@ class ShoppinglistTest(unittest.TestCase):
         self.login_route = '/auth/login'
         self.user_route = '/user/'
         self.confirm_route = '/verify/'
-        self.confirm_token=generate_token("email@mail.com")
 
 
         # binds the app to the current context
@@ -23,6 +22,7 @@ class ShoppinglistTest(unittest.TestCase):
             db.session.close()
             db.drop_all()
             db.create_all()
+            self.confirm_token=generate_token("email@mail.com")
 
     def register_user(self, username="thisuser", password="userpassword", email="email@mail.com"):
         user_data = {

@@ -18,7 +18,6 @@ class ShoppinglistTest(unittest.TestCase):
         self.shoppinglist_route = '/shoppinglists/'
         self.share_route = '/shoppinglists/share/'
         self.search_route = '/shoppinglists/'
-        self.confirm_token=generate_token("email@mail.com")
         self.confirm_route = '/verify/'
 
 
@@ -28,6 +27,7 @@ class ShoppinglistTest(unittest.TestCase):
             db.session.close()
             db.drop_all()
             db.create_all()
+            self.confirm_token=generate_token("email@mail.com")
 
     def register_user(self, username="thisuser", password="userpassword", email='email@mail.com'):
         user_data = {

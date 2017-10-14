@@ -14,8 +14,6 @@ class BuddyTest(unittest.TestCase):
         self.buddy = {'username': 'thisuser'}
         self.item = {'name':'shirt', 'price':'500', 'quantity':'5'}
         self.register_route = '/auth/register'
-        self.confirm_token=generate_token("email@mail.com")
-        self.confirm_token_two=generate_token("email2@mail.com")
         self.login_route = '/auth/login'
         self.buddies_route = '/buddies/'
         self.confirm_route = '/verify/'
@@ -31,6 +29,8 @@ class BuddyTest(unittest.TestCase):
             db.session.close()
             db.drop_all()
             db.create_all()
+            self.confirm_token=generate_token("email@mail.com")
+            self.confirm_token_two=generate_token("email2@mail.com")
 
     def register_user(self, username="thisuser", password="userpassword", email="email@mail.com"):
         user_data = {
