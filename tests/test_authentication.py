@@ -29,7 +29,7 @@ class AuthTest(unittest.TestCase):
             db.session.close()
             db.drop_all()
             db.create_all()
-            self.confirm_token=generate_token("email@mail.com")
+            self.confirm_token=generate_token('email@mail.com')
 
     def test_registration(self):
         """Test if user registration works correctly and user is saved to db"""
