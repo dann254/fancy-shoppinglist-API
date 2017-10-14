@@ -51,4 +51,14 @@ def create_app(config_name):
 
         return resp
 
+    @app.errorhandler(500)
+    def server_error(error=None):
+        message = {
+                'status': 500,
+                'message': 'OOPS!! something went wrong in: ' + request.url
+        }
+        resp = jsonify(message)
+        resp.status_code = 500
+
+        return resp
     return app
