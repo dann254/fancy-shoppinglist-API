@@ -1,7 +1,7 @@
 import unittest
 import json
 from app import create_app, db
-from app.email_handler import generate_token
+from app.email_handler import generate_token, decode_token
 
 class AuthTest(unittest.TestCase):
     """Test authentication: login and register"""
@@ -48,12 +48,11 @@ class AuthTest(unittest.TestCase):
         """Test if the registered user can login"""
         reqst = self.client().post(self.register_route, data=self.user_data)
         self.assertEqual(reqst.status_code, 201)
-        vr = self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
-        self.assertEqual(vr.status_code, 200)
+        self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
+        self.assertEqual(decode_token(self.confirm_token), 'email@mail.com')
         login_reqst = self.client().post(self.login_route, data=self.user_data)
         #get jsonified result and test if it  returns 200 status
         result = json.loads(login_reqst.data.decode())
-        self.assertEqual(self.confirm_token, "login success")
         self.assertEqual(login_reqst.status_code, 200)
         #check if it has an access token
         self.assertTrue(result['access_token'])
