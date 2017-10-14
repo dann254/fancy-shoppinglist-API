@@ -683,7 +683,17 @@ def items_view(list_id):
                     name = str(request.data.get('name', '')).strip()
                     price = request.data.get('price', '') if re.match(r"^[0-9]*$", request.data.get('price', '')) else None
                     quantity = request.data.get('quantity', '') if re.match(r"^[0-9]*$", request.data.get('quantity', '')) else None
-                    if name and price and quantity:
+                    if not re.match(r"^[0-9]*$", request.data.get('price', '')) or not re.match(r"^[0-9]*$", request.data.get('quantity', '')):
+                        response = {
+                            'message': 'please enter the correct values for either item quantity or price'
+                        }
+                        return make_response(jsonify(response)), 401
+                    if not name or not price or not quantity:
+                        response = {
+                            'message': 'please enter all the required fields'
+                        }
+                        return make_response(jsonify(response)), 401
+                    else:
                         if not re.match(r"^[a-zA-Z0-9_ -]*$", name):
                             response = {
                                 'message': 'please enter a valid item name'
@@ -703,15 +713,11 @@ def items_view(list_id):
                             'name': item.name,
                             'price': item.price,
                             'quantity': item.quantity,
-                            'belongs_to': item.belongs_to
+                            'shoppinglist_id': item.belongs_to
                         })
 
                         return make_response(response), 201
-                    else:
-                        response = {
-                            'message': 'please enter all the required fields'
-                        }
-                        return make_response(jsonify(response)), 401
+
 
                 else:
                     # get all items created for this shoppinglist
@@ -723,7 +729,7 @@ def items_view(list_id):
                             'name': item.name,
                             'price': item.price,
                             'quantity': item.quantity,
-                            'belongs_to': item.belongs_to
+                            'shoppinglist_id': item.belongs_to
                         }
                         results.append(obj)
 
@@ -792,7 +798,7 @@ def item_manipulation(list_id, item_id, **kwargs):
                     'quantity': item.quantity,
                     'date_created': item.date_created,
                     'date_modified': item.date_modified,
-                    'belongs_to': item.belongs_to
+                    'shoppinglist_id': item.belongs_to
                 }
                 return make_response(jsonify(response)), 200
             else:
@@ -804,7 +810,7 @@ def item_manipulation(list_id, item_id, **kwargs):
                     'quantity': item.quantity,
                     'date_created': item.date_created,
                     'date_modified': item.date_modified,
-                    'belongs_to': item.belongs_to
+                    'shoppinglist_id': item.belongs_to
                 }
                 return make_response(jsonify(response)), 200
         else:
@@ -1020,7 +1026,7 @@ def buddies_list_items_view(list_id):
                         'price': item.price,
                         'quantity': item.quantity,
                         'date_created': item.date_created,
-                        'belongs_to': item.belongs_to
+                        'shoppinglist_id': item.belongs_to
                     }
                     result.append(obj)
                 # return success
