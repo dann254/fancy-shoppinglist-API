@@ -91,7 +91,7 @@ def register():
 #handle email verification
 @auth_bp.route('/verify/<token>', methods=['GET'])
 def verify_email(token):
-    email = decode_token(str(token))
+    email = decode_token(token.decode("utf-8"))
 
     if not re.match(r"(^[a-zA-Z0-9_.]+@[a-zA-Z0-9-]+\.[a-z]+$)", email) and not re.match(r"(^[a-z0-9_.]+@[a-z0-9-]+\.[a-z]+\.[a-z]+$)", email):
         message = email
