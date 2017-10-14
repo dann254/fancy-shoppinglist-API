@@ -37,7 +37,7 @@ class ShoppinglistTest(unittest.TestCase):
             'username': username,
             'password': password
         }
-        self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
+        self.client().get(self.confirm_route + '{}'.format(self.confirm_token.decode("utf-8")))
         return self.client().post(self.login_route, data=user_data)
 
 

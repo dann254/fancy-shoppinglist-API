@@ -53,14 +53,14 @@ class BuddyTest(unittest.TestCase):
             'username': username,
             'password': password
         }
-        self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
+        self.client().get(self.confirm_route + '{}'.format(self.confirm_token.decode("utf-8")))
         return self.client().post(self.login_route, data=user_data)
     def login_user_two(self, username="thatuser", password="userpassword"):
         user_data = {
             'username': username,
             'password': password
         }
-        self.client().get(self.confirm_route + '{}'.format(self.confirm_token_two))
+        self.client().get(self.confirm_route + '{}'.format(self.confirm_token_two.decode("utf-8")))
         return self.client().post(self.login_route, data=user_data)
     def create_shoppinglist(self,access_token):
         return self.client().post(self.shoppinglist_route,
