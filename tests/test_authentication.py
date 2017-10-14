@@ -50,7 +50,7 @@ class AuthTest(unittest.TestCase):
         self.assertEqual(reqst.status_code, 201)
         vr = self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
         rst = json.loads(vr.data.decode())
-        self.assertEqual(vr['message'], 'email@mail.com')
+        self.assertEqual(rst['message'], 'email@mail.com')
         login_reqst = self.client().post(self.login_route, data=self.user_data)
         #get jsonified result and test if it  returns 200 status
         result = json.loads(login_reqst.data.decode())
