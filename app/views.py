@@ -230,14 +230,15 @@ def login():
             }
             return make_response(jsonify(response)), 401
         user = User.query.filter_by(username=username).first()
-        if user.confirmed==False:
-            response = {
-                'message': 'please verify your email before logging in',
-                'link': '/auth/resend_confirmation'
-            }
-            return make_response(jsonify(response)), 401
+
         if user and user.validate_password(password):
             #generate the access token for auth header
+            if user.confirmed==False:
+                response = {
+                    'message': 'please verify your email before logging in',
+                    'link': '/auth/resend_confirmation'
+                }
+                return make_response(jsonify(response)), 401
             access_token = user.generate_token(user.id)
             if access_token:
                 response = {
@@ -768,7 +769,7 @@ def item_manipulation(list_id, item_id, **kwargs):
 
             elif request.method == 'PUT':
                 #obtain updates from data if not, use the existing
-                name = str(request.data.get('name', '')).strip if str(request.data.get('name', '')) and re.match(r"^[a-zA-Z0-9_ -]*$", str(request.data.get('name', ''))) and str(request.data.get('name', '')).strip != "" else item.name
+                name = str(request.data.get('name', '')).strip() if str(request.data.get('name', '')) and re.match(r"^[a-zA-Z0-9_ -]*$", str(request.data.get('name', ''))) and str(request.data.get('name', '')).strip != "" else item.name
                 price = str(request.data.get('price', '')) if str(request.data.get('price', '')) and re.match(r"^[0-9]*$", str(request.data.get('price', ''))) else item.price
                 quantity = str(request.data.get('quantity', '')) if str(request.data.get('quantity', '')) and re.match(r"^[0-9]*$", str(request.data.get('quantity', ''))) else item.quantity
 

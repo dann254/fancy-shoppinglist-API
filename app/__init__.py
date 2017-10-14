@@ -17,7 +17,7 @@ def create_app(config_name):
     #add extension for handling Cross Origin Resource Sharing (CORS)
     CORS(app)
     mail.init_app(app)
-
+    app.url_map.strict_slashes = False
     #import the blueprints and register them on the app
     from app.views import auth_bp, shoppinglist_bp
     app.register_blueprint(auth_bp)
