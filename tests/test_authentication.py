@@ -48,7 +48,7 @@ class AuthTest(unittest.TestCase):
         """Test if the registered user can login"""
         reqst = self.client().post(self.register_route, data=self.user_data)
         self.assertEqual(reqst.status_code, 201)
-        vr = self.client().get(self.confirm_route + '{}'.format(self.confirm_token))
+        vr = self.client().get(self.confirm_route + '{}'.format(self.confirm_token.decode("utf-8")))
         rst = json.loads(vr.data.decode())
         self.assertEqual(self.confirm_token, 'email@mail.com')
         login_reqst = self.client().post(self.login_route, data=self.user_data)
