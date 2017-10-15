@@ -681,11 +681,16 @@ def items_view(list_id):
             if shoppinglist.owned_by == user_id:
                 if request.method == "POST":
                     name = str(request.data.get('name', '')).strip()
-                    price = request.data.get('price', '').strip('.') if re.match(r"^[0-9.]*$", request.data.get('price', '')) else None
-                    quantity = request.data.get('quantity', '').strip('.') if re.match(r"^[0-9.]*$", request.data.get('quantity', '')) else None
-                    if not re.match(r"^[0-9.]*$", request.data.get('price', '')) or not re.match(r"^[0-9.]*$", request.data.get('quantity', '')):
+                    price = request.data.get('price', '').strip('.') if re.match(r"^[0-9]+\.[0-9]*$", request.data.get('price', '')) or re.match(r"^[0-9]*$", request.data.get('price', '')) else None
+                    quantity = request.data.get('quantity', '').strip('.') if re.match(r"^[0-9]+\.[0-9]*$", request.data.get('quantity', '')) or re.match(r"^[0-9]*$", request.data.get('quantity', '')) else None
+                    if not re.match(r"^[0-9]*$", request.data.get('price', '')) and not re.match(r"^[0-9]+\.[0-9]*$", request.data.get('price', '')):
                         response = {
-                            'message': 'please enter the correct values for either item quantity or price'
+                            'message': 'please enter the correct value for price'
+                        }
+                        return make_response(jsonify(response)), 401
+                    if not re.match(r"^[0-9]+\.[0-9]*$", request.data.get('quantity', '')) and not re.match(r"^[0-9]*$", request.data.get('quantity', '')):
+                        response = {
+                            'message': 'please enter the correct value for quantity'
                         }
                         return make_response(jsonify(response)), 401
                     if not name or not price or not quantity:
@@ -872,8 +877,8 @@ def item_manipulation(list_id, item_id, **kwargs):
             elif request.method == 'PUT':
                 #obtain updates from data if not, use the existing
                 name = str(request.data.get('name', '')).strip() if str(request.data.get('name', '')) and re.match(r"^[a-zA-Z0-9_ -]*$", str(request.data.get('name', ''))) and str(request.data.get('name', '')).strip != "" else item.name
-                price = str(request.data.get('price', '')) if str(request.data.get('price', '')) and re.match(r"^[0-9]*$", str(request.data.get('price', ''))) else item.price
-                quantity = str(request.data.get('quantity', '')) if str(request.data.get('quantity', '')) and re.match(r"^[0-9]*$", str(request.data.get('quantity', ''))) else item.quantity
+                price = str(request.data.get('price', '')).strip('.') if str(request.data.get('price', '')) and re.match(r"^[0-9]*$", str(request.data.get('price', ''))) or re.match(r"^[0-9]+\.[0-9]*$", request.data.get('price', '')) else item.price
+                quantity = str(request.data.get('quantity', '')).strip('.') if str(request.data.get('quantity', '')) and re.match(r"^[0-9]*$", str(request.data.get('quantity', ''))) or re.match(r"^[0-9]+\.[0-9]*$", request.data.get('quantity', '')) else item.quantity
 
                 existing_item=Item.query.filter_by(belongs_to=list_id).all()
                 for i in existing_item:
