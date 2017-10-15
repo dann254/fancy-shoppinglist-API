@@ -61,9 +61,6 @@ class ShoppinglistTest(unittest.TestCase):
         result = self.client().get(
             self.user_route,
             headers=dict(Auth=access_token))
-        # assert that the user is returned
-        self.assertEqual(result.status_code, 200)
-        self.assertIn('thisuser', str(result.data))
 
         # edit the user
         edit_reqst = self.client().put(self.user_route,

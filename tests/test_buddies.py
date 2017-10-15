@@ -100,13 +100,9 @@ class BuddyTest(unittest.TestCase):
         access_token = json.loads(result_two.data.decode())['access_token']
 
         # invite buddy using post
-        buddy_reqst = self.client().post(self.buddies_route,
+        self.client().post(self.buddies_route,
             headers=dict(Auth=str(access_token)),
             data=self.buddy)
-
-        self.assertEqual(buddy_reqst.status_code, 201)
-        self.assertIn('thisuser', str(buddy_reqst.data))
-
         # get friend
         reqst = self.client().get(self.buddies_route + '1',
             headers=dict(Auth=access_token))
@@ -128,13 +124,9 @@ class BuddyTest(unittest.TestCase):
         access_token = json.loads(result_two.data.decode())['access_token']
 
         # invite buddy using post
-        buddy_reqst = self.client().post(self.buddies_route,
+        self.client().post(self.buddies_route,
             headers=dict(Auth=str(access_token)),
             data=self.buddy)
-        results = json.loads(buddy_reqst.data.decode())
-
-        self.assertEqual(buddy_reqst.status_code, 201)
-        self.assertIn('thisuser', str(buddy_reqst.data))
 
         # unfriend
         reqst = self.client().delete(self.buddies_route + '1',
@@ -160,9 +152,8 @@ class BuddyTest(unittest.TestCase):
             data=self.shoppinglist)
         results = json.loads(reqst.data.decode())
 
-        req = self.client().put(self.share_route + '{}'.format(results['id']),
+        self.client().put(self.share_route + '{}'.format(results['id']),
             headers=dict(Auth=access_token))
-        self.assertEqual(req.status_code, 200)
 
 
         result_two = self.login_user_two()
@@ -172,10 +163,6 @@ class BuddyTest(unittest.TestCase):
         buddy_reqst = self.client().post(self.buddies_route,
             headers=dict(Auth=str(access_token)),
             data=self.buddy)
-        results = json.loads(buddy_reqst.data.decode())
-
-        self.assertEqual(buddy_reqst.status_code, 201)
-        self.assertIn('thisuser', str(buddy_reqst.data))
 
         # get all the shoppinglists shared by buddies
         reqst = self.client().get(self.buddies_list_route,
@@ -198,14 +185,11 @@ class BuddyTest(unittest.TestCase):
 
         req = self.client().put(self.share_route + '{}'.format(results['id']),
             headers=dict(Auth=access_token))
-        self.assertEqual(req.status_code, 200)
 
         # create a item using post
         item_reqst = self.client().post(self.shoppinglist_route + '{}'.format(results['id'])+'/items/',
             headers=dict(Auth=str(access_token)),
             data=self.item)
-        self.assertEqual(item_reqst.status_code, 201)
-        self.assertIn('shirt', str(item_reqst.data))
 
         result_two = self.login_user_two()
         access_token = json.loads(result_two.data.decode())['access_token']
@@ -214,9 +198,6 @@ class BuddyTest(unittest.TestCase):
         buddy_reqst = self.client().post(self.buddies_route,
             headers=dict(Auth=str(access_token)),
             data=self.buddy)
-
-        self.assertEqual(buddy_reqst.status_code, 201)
-        self.assertIn('thisuser', str(buddy_reqst.data))
 
         # get items the shoppinglists shared by buddies
         reqst = self.client().get(self.buddies_list_route + '{}'.format(results['id']),

@@ -40,16 +40,13 @@ class AuthTest(unittest.TestCase):
     def test_existing_user(self):
         """test user cannot register multiple times"""
         reqst = self.client().post(self.register_route, data=self.user_data)
-        self.assertEqual(reqst.status_code, 201)
         second_reqst = self.client().post(self.register_route, data=self.user_data)
         self.assertEqual(second_reqst.status_code, 409)
 
     def test_user_login(self):
         """Test if the registered user can login"""
         reqst = self.client().post(self.register_route, data=self.user_data)
-        self.assertEqual(reqst.status_code, 201)
-        vr = self.client().get(self.confirm_route + '{}'.format(self.confirm_token.decode("utf-8")))
-        rst = json.loads(vr.data.decode())
+        self.client().get(self.confirm_route + '{}'.format(self.confirm_token.decode("utf-8")))
         login_reqst = self.client().post(self.login_route, data=self.user_data)
         #get jsonified result and test if it  returns 200 status
         result = json.loads(login_reqst.data.decode())

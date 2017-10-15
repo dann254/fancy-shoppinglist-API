@@ -68,10 +68,9 @@ class ShoppinglistTest(unittest.TestCase):
         access_token = json.loads(result.data.decode())['access_token']
 
         # create a shoppinglist by making a POST request
-        reqst = self.client().post(self.shoppinglist_route,
+        self.client().post(self.shoppinglist_route,
             headers=dict(Auth=access_token),
             data=self.shoppinglist)
-        self.assertEqual(reqst.status_code, 201)
 
         # get all the shoppinglists that belong to the test user
         reqst = self.client().get(self.shoppinglist_route,
@@ -92,7 +91,6 @@ class ShoppinglistTest(unittest.TestCase):
             data=self.shoppinglist)
 
         # check if the shoppinglist is created then get the result in json
-        self.assertEqual(reqst.status_code, 201)
         results = json.loads(reqst.data.decode())
 
         result = self.client().get(
@@ -113,7 +111,6 @@ class ShoppinglistTest(unittest.TestCase):
             self.shoppinglist_route,
             headers=dict(Auth=access_token),
             data=self.shoppinglist)
-        self.assertEqual(reqst.status_code, 201)
         # get the json with the shoppinglist
         results = json.loads(reqst.data.decode())
 
@@ -140,7 +137,6 @@ class ShoppinglistTest(unittest.TestCase):
             self.shoppinglist_route,
             headers=dict(Auth=access_token),
             data=self.shoppinglist)
-        self.assertEqual(reqst.status_code, 201)
         results = json.loads(reqst.data.decode())
 
         # delete the shoppinglist just created
@@ -164,7 +160,6 @@ class ShoppinglistTest(unittest.TestCase):
             self.shoppinglist_route,
             headers=dict(Auth=access_token),
             data=self.shoppinglist)
-        self.assertEqual(reqst.status_code, 201)
         results = json.loads(reqst.data.decode())
 
         # share the shoppinglist just created
@@ -187,7 +182,6 @@ class ShoppinglistTest(unittest.TestCase):
             self.shoppinglist_route,
             headers=dict(Auth=access_token),
             data=self.shoppinglist)
-        self.assertEqual(reqst.status_code, 201)
 
         # search the shoppinglist just created
         req = self.client().get(self.search_route + '?{}'.format(urllib.parse.urlencode({"q":"clothes"})),
@@ -222,15 +216,12 @@ class ShoppinglistTest(unittest.TestCase):
 
         # create a  request
         reqst = self.create_shoppinglist(access_token)
-        self.assertEqual(reqst.status_code, 201)
 
         results = json.loads(reqst.data.decode())
         #create an item
         item_reqst = self.client().post(self.shoppinglist_route + '{}'.format(results['id'])+'/items/',
             headers=dict(Auth=str(access_token)),
             data=self.item)
-        self.assertEqual(item_reqst.status_code, 201)
-        self.assertIn('shirt', str(item_reqst.data))
 
         # get all the items that belong to the test shoppinglist
         reqst = self.client().get(self.shoppinglist_route + '{}'.format(results['id'])+'/items/' + '{}'.format(results['id']),
@@ -251,16 +242,11 @@ class ShoppinglistTest(unittest.TestCase):
         result = self.client().get(
             self.shoppinglist_route + '{}'.format(results['id']),
             headers=dict(Auth=access_token))
-        # assert that the shoppinglist is actually returned given its ID
-        self.assertEqual(result.status_code, 200)
-        self.assertIn('clothes-sl', str(result.data))
 
         #create an item
         item_reqst = self.client().post(self.shoppinglist_route + '{}'.format(results['id'])+'/items/' ,
             headers=dict(Auth=str(access_token)),
             data=self.item)
-        self.assertEqual(item_reqst.status_code, 201)
-        self.assertIn('shirt', str(item_reqst.data))
         item_results = json.loads(item_reqst.data.decode())
         #request item
         result = self.client().get(self.shoppinglist_route + '{}'.format(results['id'])+'/items/' + '{}'.format(item_results['id']),
@@ -283,8 +269,6 @@ class ShoppinglistTest(unittest.TestCase):
         item_reqst = self.client().post(self.shoppinglist_route + '{}'.format(results['id'])+'/items/',
             headers=dict(Auth=str(access_token)),
             data=self.item)
-        self.assertEqual(item_reqst.status_code, 201)
-        self.assertIn('shirt', str(item_reqst.data))
         item_results = json.loads(item_reqst.data.decode())
 
         # edit the created item
