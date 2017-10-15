@@ -127,8 +127,8 @@ class Item(db.Model):
     #define collumns
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
-    price = db.Column(db.Integer())
-    quantity = db.Column(db.Integer())
+    price = db.Column(db.Float())
+    quantity = db.Column(db.Float())
     belongs_to = db.Column(db.Integer, db.ForeignKey(Shoppinglist.id))
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())

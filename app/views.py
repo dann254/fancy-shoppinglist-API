@@ -681,9 +681,9 @@ def items_view(list_id):
             if shoppinglist.owned_by == user_id:
                 if request.method == "POST":
                     name = str(request.data.get('name', '')).strip()
-                    price = request.data.get('price', '') if re.match(r"^[0-9]*$", request.data.get('price', '')) else None
-                    quantity = request.data.get('quantity', '') if re.match(r"^[0-9]*$", request.data.get('quantity', '')) else None
-                    if not re.match(r"^[0-9]*$", request.data.get('price', '')) or not re.match(r"^[0-9]*$", request.data.get('quantity', '')):
+                    price = request.data.get('price', '').strip('.') if re.match(r"^[0-9.]*$", request.data.get('price', '')) else None
+                    quantity = request.data.get('quantity', '').strip('.') if re.match(r"^[0-9.]*$", request.data.get('quantity', '')) else None
+                    if not re.match(r"^[0-9.]*$", request.data.get('price', '')) or not re.match(r"^[0-9.]*$", request.data.get('quantity', '')):
                         response = {
                             'message': 'please enter the correct values for either item quantity or price'
                         }
