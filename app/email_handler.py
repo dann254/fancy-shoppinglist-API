@@ -62,7 +62,7 @@ def decode_token(token):
 
 def handler(email):
     token = generate_token(email)
-    url = str(current_app.config.get('APP_URL')) + "/verify/" + str(token)
+    url = str(current_app.config.get('APP_URL')) + "/verify/" + str(token.decode("utf-8"))
     message = "<p>Dear " + '{}'.format(str(email)) +",</p><p>You will need to confirm your email to start using <b>Fancy Shoppinglist</b></p><p>This link expires in 24 hours</p><p>If you initiated this confirmation, please click on the link below:<br/>&nbsp;&nbsp;&nbsp;&nbsp;"+ '{}'.format(str(url)) +"</p><p>If you did not initiate this confirmation, you may safely ignore this email</p><p>Sincerely,<br/>Fancy Shoppinglist</p>"
     mbdy="Dear User \nYou will need to confirm your email to start using Fancy Shoppin\nIf you initiated this confirmation, please click on the link be\n&nbsp;&nbsp;&nbsp;&nbsp;%s </p>If you did not initiate this confirmation, you may safely ignore this \nSincerely,\nFancy Shoppin\n" %url
     subject = "Confirm email"
@@ -72,7 +72,7 @@ def handler(email):
 
 def reset_handler(email):
     token = generate_reset_token(email)
-    url = str(current_app.config.get('APP_URL')) + "/auth/reset_password/" + str(token)
+    url = str(current_app.config.get('APP_URL')) + "/auth/reset_password/" + str(token.decode("utf-8"))
     message = "<p>Dear " + '{}'.format(str(email)) +",</p><p>This an email for you to reset your <b>Fancy Shoppinglist</b> password</p><p>This link expires in 6 hours</p><p>If you initiated this reset, please click on the link below:<br/>&nbsp;&nbsp;&nbsp;&nbsp;"+ '{}'.format(str(url)) +" </p><p>If you did not initiate this confirmation, you may safely ignore this email</p><p>Sincerely,<br/>Fancy Shoppinglist</p>"
     mbdy="Dear User, This an email for you to reset your Fancy shoppinglist password\nIf you initiated this reset, please click on the link below\n&nbsp;&nbsp;&nbsp;&nbsp;%s </p>If you did not initiate this reset, you may safely ignore this \nSincerely,\nFancy Shoppin\n" %url
     subject = "Reset password"
