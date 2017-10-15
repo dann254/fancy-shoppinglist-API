@@ -63,7 +63,7 @@ def decode_token(token):
 def handler(email):
     token = generate_token(email)
     url = str(current_app.config.get('APP_URL')) + "/verify/" + str(token)
-    message = "<p>Dear " + '{}'.format(str(email)) +",</p><p>You will need to confirm your email to start using <b>Fancy Shoppinglist</b></p><p>This link expires in 24 hours</p><p>If you initiated this confirmation, please click on the link below:<br/>&nbsp;&nbsp;&nbsp;&nbsp;"+ '{}'.format(str(url)) +" </p><p>If you did not initiate this confirmation, you may safely ignore this email</p><p>Sincerely,<br/>Fancy Shoppinglist</p>"
+    message = "<p>Dear " + '{}'.format(str(email)) +",</p><p>You will need to confirm your email to start using <b>Fancy Shoppinglist</b></p><p>This link expires in 24 hours</p><p>If you initiated this confirmation, please click on the link below:<br/>&nbsp;&nbsp;&nbsp;&nbsp;"+ '{}'.format(str(url)) +"</p><p>If you did not initiate this confirmation, you may safely ignore this email</p><p>Sincerely,<br/>Fancy Shoppinglist</p>"
     mbdy="Dear User \nYou will need to confirm your email to start using Fancy Shoppin\nIf you initiated this confirmation, please click on the link be\n&nbsp;&nbsp;&nbsp;&nbsp;%s </p>If you did not initiate this confirmation, you may safely ignore this \nSincerely,\nFancy Shoppin\n" %url
     subject = "Confirm email"
     msg= Message(recipients=[email], html=message, body=mbdy, subject=subject)
