@@ -713,6 +713,8 @@ def items_view(list_id):
                             'name': item.name,
                             'price': item.price,
                             'quantity': item.quantity,
+                            'date_created': item.date_created,
+                            'date_modified': item.date_modified,
                             'shoppinglist_id': item.belongs_to
                         })
 
@@ -720,20 +722,114 @@ def items_view(list_id):
 
 
                 else:
-                    # get all items created for this shoppinglist
-                    item_list = Item.get_all(list_id)
-                    results = []
-                    for item in item_list:
-                        obj = {
-                            'id': item.id,
-                            'name': item.name,
-                            'price': item.price,
-                            'quantity': item.quantity,
-                            'shoppinglist_id': item.belongs_to
-                        }
-                        results.append(obj)
+                    if not request.args.get('limit') and not request.args.get('q'):
+                        # get all items created for this shoppinglist
+                        item_list = Item.get_all(list_id)
+                        results = []
+                        for item in item_list:
+                            obj = {
+                                'id': item.id,
+                                'name': item.name,
+                                'price': item.price,
+                                'quantity': item.quantity,
+                                'date_created': item.date_created,
+                                'date_modified': item.date_modified,
+                                'shoppinglist_id': item.belongs_to
+                            }
+                            results.append(obj)
 
-                    return make_response(jsonify(results=results)), 200
+                        return make_response(jsonify(results=results)), 200
+                    if not isinstance(user_id, str):
+                        item_content = Item.query.filter_by(belongs_to=list_id).all()
+                        if not item_content:
+                            return make_response(jsonify({ 'message': 'you dont have any items for this shoppinglists'})), 404
+                    if request.args.get('q'):
+                        item_name = str(request.args.get('q'))
+                        if item_name:
+                            result_ids = []
+                            res = []
+                            try:
+                                for sitem in item_content:
+                                   if item_name in sitem.name:
+                                        result_ids.append(sitem.id)
+                                results = Item.query.filter(Item.id.in_(result_ids)).all()
+                                if not results:
+                                    return make_response(jsonify({ 'message': 'you dont have any items with that name on this shoppinglist'})), 401
+                                for item in results:
+                                    obj = {
+                                        'id': item.id,
+                                        'name': item.name,
+                                        'price': item.price,
+                                        'quantity': item.quantity,
+                                        'date_created': item.date_created,
+                                        'date_modified': item.date_modified,
+                                        'shoppinglist_id': item.belongs_to
+                                    }
+                                    res.append(obj)
+                                return make_response(jsonify(result=res)), 200
+                            except Exception as e:
+                                return make_response(jsonify({ 'message': str(e)})), 401
+                    if request.args.get('limit') and request.args.get('start'):
+                        try:
+                            start=int(request.args.get('start'))
+                            limit=int(request.args.get('limit'))
+                        except Exception:
+                            return make_response(jsonify({'info': 'Please make sure limit and start are both integers'})), 401
+
+                        if start <= 0 or limit <= 0:
+                            return make_response(jsonify({'info': 'Start or Limit must be a number greater than or equal to 1'})), 401
+                        if start and limit:
+                            res = []
+                            try:
+                                results = Item.query.order_by(Item.id).filter_by(belongs_to=list_id).paginate(start,limit,error_out=False)
+                                if not results:
+                                    return make_response(jsonify({ 'message': 'error occured'})), 401
+                                url = '/shoppinglists/' + '{}'.format(list_id) + '/items/'
+                                previous = results.prev_num
+                                nextint= results.next_num
+                                if start<=1:links = {
+                                    'next': url + '?start=%d&limit=%d' % (nextint, limit)
+                                }
+                                elif len(results.items)<limit :
+                                    links = {
+                                        'previous': url + '?start=%d&limit=%d' % (previous, limit)
+                                    }
+                                else:
+                                    links = {
+                                    'next': url + '?start=%d&limit=%d' % (nextint, limit),
+                                    'previous': url + '?start=%d&limit=%d' % (previous, limit)
+                                    }
+
+                                for item in results.items:
+                                    obj = {
+                                        'id': item.id,
+                                        'name': item.name,
+                                        'price': item.price,
+                                        'quantity': item.quantity,
+                                        'date_created': item.date_created,
+                                        'date_modified': item.date_modified,
+                                        'shoppinglist_id': item.belongs_to
+                                    }
+                                    res.append(obj)
+                                return make_response(jsonify(links=links,result=res)), 200
+                            except Exception as e:
+                                return make_response(jsonify({ 'message': str(e)})), 401
+                    else:
+                        item_list = Item.get_all(list_id)
+                        results = []
+                        for item in item_list:
+                            obj = {
+                                'id': item.id,
+                                'name': item.name,
+                                'price': item.price,
+                                'date_created': item.date_created,
+                                'date_modified': item.date_modified,
+                                'quantity': item.quantity,
+                                'shoppinglist_id': item.belongs_to
+                            }
+                            results.append(obj)
+
+                        return make_response(jsonify(results=results)), 200
             else:
                 response = {
                     'message': 'anouthorized'
