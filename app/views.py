@@ -76,7 +76,7 @@ def register():
         else:
             #the user already exists
             response = {
-                'message': 'username already exists'
+                'message': 'username or email already exists'
             }
             # return message with code 409 - conflict
             return make_response(jsonify(response)), 409
