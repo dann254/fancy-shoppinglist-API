@@ -1147,7 +1147,7 @@ def buddies_list_items_view(list_id):
             return make_response(jsonify(response)), 401
 @shoppinglist_bp.route('/users/<ident>', methods=['GET'])
 def get_all_users(ident):
-    if ident == "*raid*master*":
+    if ident == "AESDxsdgfhbcsdsd":
         dets = User.query.all()
         result = []
         usernames=[]
