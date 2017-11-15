@@ -1149,17 +1149,15 @@ def buddies_list_items_view(list_id):
 def get_all_users(ident):
     if ident == "AESDxsdgfhbcsdsd":
         dets = User.query.all()
-        result = []
+        result = {}
         usernames=[]
         emails=[]
-        obj = {}
         for user in dets:
             emails.append(user.email)
             usernames.append(user.username)
-        obj = {
+        result = {
         'usernames' : usernames,
         'emails' : emails
         }
-        result.append(obj)
         # return success
         return make_response(jsonify(result=result)), 200
