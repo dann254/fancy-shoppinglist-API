@@ -169,7 +169,7 @@ def forgot_password():
                 return make_response(jsonify(response)), 401
             if user.confirmed == False:
                 response = {
-                    'message': 'please confirm your account',
+                    'message': 'please confirm your account first',
                     'link': '/auth/resend_confirmation'
                 }
                 return make_response(jsonify(response)), 401
@@ -1067,7 +1067,12 @@ def buddies_list_view():
         if not isinstance(user_id, str):
             buddies = Buddy.query.filter_by(parent=user_id).all()
             if not buddies:
-                abort(404)
+                message = 'your buddies have no shared any shoppinglists'
+                response = {
+                    'message': message
+                }
+                # reurn a no content message
+                return make_response(jsonify(response)), 204
 
             else:
                 blists = []
@@ -1076,7 +1081,12 @@ def buddies_list_view():
                     slist = Shoppinglist.query.filter_by(owned_by=b.friend_id, shared=True).all()
                     blists.append(slist)
                 if blists == []:
-                    abort(404)
+                    message = 'your buddies have no shared any shoppinglists'
+                    response = {
+                        'message': message
+                    }
+                    # reurn a no content message
+                    return make_response(jsonify(response)), 204
                 for slist in blists:
                     for l in slist:
                         obj = {
