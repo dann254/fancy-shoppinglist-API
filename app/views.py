@@ -1067,7 +1067,7 @@ def buddies_list_view():
         if not isinstance(user_id, str):
             buddies = Buddy.query.filter_by(parent=user_id).all()
             if not buddies:
-                message = 'your buddies have no shared any shoppinglists'
+                message = 'Add buddies to view their shared shoppinglists.'
                 response = {
                     'message': message
                 }
@@ -1081,7 +1081,7 @@ def buddies_list_view():
                     slist = Shoppinglist.query.filter_by(owned_by=b.friend_id, shared=True).all()
                     blists.append(slist)
                 if blists == []:
-                    message = 'your buddies have no shared any shoppinglists'
+                    message = 'your buddies have not shared any shoppinglists'
                     response = {
                         'message': message
                     }
