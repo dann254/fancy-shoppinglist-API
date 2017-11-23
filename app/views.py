@@ -1072,7 +1072,7 @@ def buddies_list_view():
                     'message': message
                 }
                 # reurn a no content message
-                return make_response(jsonify(response)), 204
+                return make_response(jsonify(response)), 400
 
             else:
                 blists = []
@@ -1086,7 +1086,7 @@ def buddies_list_view():
                         'message': message
                     }
                     # reurn a no content message
-                    return make_response(jsonify(response)), 204
+                    return make_response(jsonify(response)), 400
                 for slist in blists:
                     for l in slist:
                         obj = {
