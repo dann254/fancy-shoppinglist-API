@@ -109,7 +109,7 @@ class Shoppinglist(db.Model):
     @staticmethod
     def get_all(user_id):
         """gets all the shoppinglists for a given user."""
-        return Shoppinglist.query.filter_by(owned_by=user_id)
+        return Shoppinglist.query.filter_by(owned_by=user_id).order_by(date_created.asc)
 
     def delete(self):
         """Deletes a passed shoppinglist."""
