@@ -523,7 +523,7 @@ def shoppinglists_view():
                             return make_response(jsonify({ 'message': str(e)})), 401
                 else:
                     # get all shoppinglists created by this user
-                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).all()
+                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).order_by(date_created).all()
                     results = []
 
                     for shoppinglist in shoppinglists:
