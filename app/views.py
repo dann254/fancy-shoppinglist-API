@@ -1135,6 +1135,9 @@ def buddies_list_items_view(list_id):
                     # return 401
                     return make_response(jsonify(response)), 401
                 slist_items = Item.query.filter_by(belongs_to=list_id).all()
+                owner = User.query.get(slist.owned_by)
+                result.append(owner)
+                result.append(slist)
                 if not slist_items:
                     abort(404)
                 for item in slist_items:
