@@ -1089,7 +1089,7 @@ def buddies_list_view():
                     return make_response(jsonify(response)), 400
                 for slist in blists:
                     for l in slist:
-                        owner = User.query.filter_by(id=l.owned_by)
+                        owner = User.query.get(l.owned_by)
                         obj = {
                             'id': l.id,
                             'name': l.name,
