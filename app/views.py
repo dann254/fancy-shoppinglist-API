@@ -1139,7 +1139,9 @@ def buddies_list_items_view(list_id):
                 result.append(owner)
                 result.append(slist)
                 if not slist_items:
-                    abort(404)
+                    response = {
+                        'message': 'This shoppinglist has no items'
+                    }
                 for item in slist_items:
                     obj = {
                         'id': item.id,
