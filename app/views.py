@@ -1135,7 +1135,7 @@ def buddies_list_items_view(list_id):
                     # return 401
                     return make_response(jsonify(response)), 401
                 slist_items = Item.query.filter_by(belongs_to=list_id).all()
-                owner = User.query.get(slist.owned_by)
+                sowner = User.query.get(slist.owned_by)
                 if not slist_items:
                     response = {
                         'message': 'This shoppinglist has no items'
@@ -1152,9 +1152,16 @@ def buddies_list_items_view(list_id):
                     }
                     result.append(obj)
                 response = {
-                    result,
-                    owner,
-                    slist
+                    'results': result,
+                    'owner': {  'id': sowner.id,
+                                'username': sowner.username
+                            },
+                    'shoppinglist': {
+                            'id': slist.id,
+                            'name': slist.name,
+                            'date_created': slist.date_created,
+                            'owned_by': slist.owned_by
+                    }
 
                 }
                 # return success
