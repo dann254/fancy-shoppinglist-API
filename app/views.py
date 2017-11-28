@@ -1142,6 +1142,7 @@ def buddies_list_items_view(list_id):
                     response = {
                         'message': 'This shoppinglist has no items'
                     }
+                    return make_response(jsonify(response)), 401
                 for item in slist_items:
                     obj = {
                         'id': item.id,
