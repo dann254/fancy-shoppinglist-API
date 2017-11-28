@@ -1136,8 +1136,6 @@ def buddies_list_items_view(list_id):
                     return make_response(jsonify(response)), 401
                 slist_items = Item.query.filter_by(belongs_to=list_id).all()
                 owner = User.query.get(slist.owned_by)
-                result.append(owner)
-                result.append(slist)
                 if not slist_items:
                     response = {
                         'message': 'This shoppinglist has no items'
@@ -1153,8 +1151,14 @@ def buddies_list_items_view(list_id):
                         'shoppinglist_id': item.belongs_to
                     }
                     result.append(obj)
+                response = {
+                    result,
+                    owner,
+                    slist
+
+                }
                 # return success
-                return make_response(jsonify(result=result)), 200
+                return make_response(jsonify(response=response)), 200
         else:
             # user is not authenticated send error message
             message = user_id
