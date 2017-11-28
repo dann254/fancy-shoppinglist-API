@@ -1094,7 +1094,8 @@ def buddies_list_view():
                             'name': l.name,
                             'shared': l.shared,
                             'date_created': l.date_created,
-                            'owned_by': l.owned_by
+                            'owned_by': l.owned_by,
+                            'owner':(User.query.filter_by(id=l.owned_by)).name
                         }
                         result.append(obj)
                 # return success
