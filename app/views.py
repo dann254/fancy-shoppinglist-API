@@ -1149,7 +1149,7 @@ def buddies_list_items_view(list_id):
                                 'owned_by': slist.owned_by
                                 }
                             }
-                    return make_response(jsonify(response)), 200
+                    return make_response(jsonify(response=response)), 200
                 for item in slist_items:
                     obj = {
                         'id': item.id,
