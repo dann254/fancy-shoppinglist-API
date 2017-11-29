@@ -1147,8 +1147,9 @@ def buddies_list_items_view(list_id):
                                 'name': slist.name,
                                 'date_created': slist.date_created,
                                 'owned_by': slist.owned_by
-                        }
-                    return make_response(jsonify(response)), 401
+                                }
+                            }
+                    return make_response(jsonify(response)), 200
                 for item in slist_items:
                     obj = {
                         'id': item.id,
