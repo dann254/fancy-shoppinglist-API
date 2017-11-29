@@ -1138,8 +1138,16 @@ def buddies_list_items_view(list_id):
                 sowner = User.query.get(slist.owned_by)
                 if not slist_items:
                     response = {
-                        'message': 'This shoppinglist has no items'
-                    }
+                        'results': [],
+                        'owner': {  'id': sowner.id,
+                                    'username': sowner.username
+                                },
+                        'shoppinglist': {
+                                'id': slist.id,
+                                'name': slist.name,
+                                'date_created': slist.date_created,
+                                'owned_by': slist.owned_by
+                        }
                     return make_response(jsonify(response)), 401
                 for item in slist_items:
                     obj = {
