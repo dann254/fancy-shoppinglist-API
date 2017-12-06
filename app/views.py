@@ -473,7 +473,7 @@ def shoppinglists_view():
                                     'owned_by': shoppinglist.owned_by
                                 }
                                 res.append(obj)
-                            return make_response(jsonify(result=res)), 200
+                            return make_response(jsonify(results=res)), 200
                         except Exception as e:
                             return make_response(jsonify({ 'message': str(e)})), 401
 
@@ -518,7 +518,7 @@ def shoppinglists_view():
                                     'owned_by': shoppinglist.owned_by
                                 }
                                 res.append(obj)
-                            return make_response(jsonify(links=links,result=res)), 200
+                            return make_response(jsonify(links=links,results=res)), 200
                         except Exception as e:
                             return make_response(jsonify({ 'message': str(e)})), 401
                 else:
