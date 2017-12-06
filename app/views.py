@@ -492,7 +492,7 @@ def shoppinglists_view():
                             results = Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id).paginate(start,limit,error_out=False)
                             if not results:
                                 return make_response(jsonify({ 'message': 'error occured'})), 401
-                            url = '/shoppinglists/'
+                            url = ''
                             previous = results.prev_num
                             nextint= results.next_num
                             if start<=1:links = {
