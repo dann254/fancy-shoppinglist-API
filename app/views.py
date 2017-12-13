@@ -448,10 +448,10 @@ def shoppinglists_view():
 
                     return make_response(jsonify(results=results)), 200
                 if not isinstance(user_id, str):
-                    result = []
+                    results = []
                     shoppinglist_content = Shoppinglist.query.filter_by(owned_by=user_id).all()
                     if not shoppinglist_content:
-                        return make_response(jsonify(result=result)), 404
+                        return make_response(jsonify(results=results)), 404
                 if request.args.get('q'):
                     list_name = str(request.args.get('q'))
                     if list_name:
