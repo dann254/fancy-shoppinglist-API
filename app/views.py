@@ -484,10 +484,10 @@ def shoppinglists_view():
                     except Exception:
                         return make_response(jsonify({'info': 'Please enter limit or start as an integer'})), 401
 
-                    if !Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id):
+                    if not Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id):
                         results = []
                         return make_response(jsonify(results=results)), 200
-                    
+
                     if start <= 0 or limit <= 0:
                         return make_response(jsonify({'info': 'Start or Limit must be a number greater than or equal to 1'})), 401
                     if start and limit:
