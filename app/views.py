@@ -448,9 +448,10 @@ def shoppinglists_view():
 
                     return make_response(jsonify(results=results)), 200
                 if not isinstance(user_id, str):
+                    result = []
                     shoppinglist_content = Shoppinglist.query.filter_by(owned_by=user_id).all()
                     if not shoppinglist_content:
-                        return make_response(jsonify({ 'message': 'you dont have any shoppinglists'})), 404
+                        return make_response(jsonify(result=result)), 404
                 if request.args.get('q'):
                     list_name = str(request.args.get('q'))
                     if list_name:
@@ -483,10 +484,6 @@ def shoppinglists_view():
                         limit=int(request.args.get('limit'))
                     except Exception:
                         return make_response(jsonify({'info': 'Please enter limit or start as an integer'})), 401
-
-                    if not Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id):
-                        results = []
-                        return make_response(jsonify(results=results)), 200
 
                     if start <= 0 or limit <= 0:
                         return make_response(jsonify({'info': 'Start or Limit must be a number greater than or equal to 1'})), 401
