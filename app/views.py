@@ -490,13 +490,22 @@ def shoppinglists_view():
                     if start and limit:
                         res = []
                         try:
+                            all_slists = Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id).count()
                             results = Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id).paginate(start,limit,error_out=False)
                             if not results:
                                 return make_response(jsonify({ 'message': 'error occured'})), 401
                             url = ''
                             previous = results.prev_num
                             nextint= results.next_num
-                            if start<=1:links = {
+                            if len(results.items)<limit and start==1:
+                                links={}
+                            elif (all_slists-limit) == 0:
+                                links={}
+                            elif (all_slists-(limit*start)) == 0:
+                                links = {
+                                    'previous': url + '?start=%d&limit=%d' % (previous, limit)
+                                }
+                            elif start<=1:links = {
                                 'next': url + '?start=%d&limit=%d' % (nextint, limit)
                             }
                             elif len(results.items)<limit :
