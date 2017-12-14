@@ -987,9 +987,12 @@ def buddies_view():
                 try:
                     for b in buddies:
                         user = User.query.filter_by(id=b.friend_id).first()
+                        shared_lists =Shoppinglist.query.filter_by(owned_by=b.friend_id, shared=true).count()
                         friend = {
                             'username': user.username,
-                            'friend_id': user.id
+                            'email': user.email,
+                            'friend_id': user.id,
+                            'shared': shared_lists
                         }
                         response.append(friend)
                     # return success
