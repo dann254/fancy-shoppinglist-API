@@ -6,7 +6,7 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET = os.getenv('SECRET')
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-    MAIL_SERVER = 'uscentral75.myserverhosts.com'
+    MAIL_SERVER = 'nbo2.domainskenya.co.ke'
     MAIL_PORT = '465'
     MAIL_USE_SSL = True
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
