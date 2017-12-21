@@ -744,7 +744,7 @@ def items_view(list_id):
                 else:
                     if not request.args.get('limit') and not request.args.get('q'):
                         # get all items created for this shoppinglist
-                        item_list = Item.get_all(list_id)
+                        item_list = Item.get_all(list_id).order_by(Item.date_created)
                         results = []
                         for item in item_list:
                             obj = {
@@ -835,7 +835,7 @@ def items_view(list_id):
                             except Exception as e:
                                 return make_response(jsonify({ 'message': str(e)})), 401
                     else:
-                        item_list = Item.get_all(list_id)
+                        item_list = Item.get_all(list_id).order_by(Item.date_created)
                         results = []
                         for item in item_list:
                             obj = {
@@ -1147,7 +1147,7 @@ def buddies_list_items_view(list_id):
                     }
                     # return 401
                     return make_response(jsonify(response)), 401
-                slist_items = Item.query.filter_by(belongs_to=list_id).all()
+                slist_items = Item.query.filter_by(belongs_to=list_id).order_by(Item.date_created).all()
                 sowner = User.query.get(slist.owned_by)
                 if not slist_items:
                     response = {
