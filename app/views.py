@@ -76,7 +76,7 @@ def register():
         else:
             #the user already exists
             response = {
-                'message': 'username already exists'
+                'message': 'username or email already exists'
             }
             # return message with code 409 - conflict
             return make_response(jsonify(response)), 409
@@ -102,6 +102,11 @@ def verify_email(token):
 
     else:
         user = User.query.filter_by(email=email).first()
+        if user.confirmed==True:
+            response = {
+            'message': 'Your email is already confirmed. Please login to continue.'
+            }
+            return make_response(jsonify(response)), 200
         user.confirmed = True
         user.save()
         response = {
@@ -164,7 +169,7 @@ def forgot_password():
                 return make_response(jsonify(response)), 401
             if user.confirmed == False:
                 response = {
-                    'message': 'please confirm your account',
+                    'message': 'please confirm your account first',
                     'link': '/auth/resend_confirmation'
                 }
                 return make_response(jsonify(response)), 401
@@ -427,7 +432,7 @@ def shoppinglists_view():
             else:
                 if not request.args.get('limit') and not request.args.get('q'):
                     # get all shoppinglists created by this user
-                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).all()
+                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).order_by(Shoppinglist.date_created).all()
                     results = []
 
                     for shoppinglist in shoppinglists:
@@ -443,9 +448,10 @@ def shoppinglists_view():
 
                     return make_response(jsonify(results=results)), 200
                 if not isinstance(user_id, str):
+                    results = []
                     shoppinglist_content = Shoppinglist.query.filter_by(owned_by=user_id).all()
                     if not shoppinglist_content:
-                        return make_response(jsonify({ 'message': 'you dont have any shoppinglists'})), 404
+                        return make_response(jsonify(results=results)), 200
                 if request.args.get('q'):
                     list_name = str(request.args.get('q'))
                     if list_name:
@@ -468,7 +474,7 @@ def shoppinglists_view():
                                     'owned_by': shoppinglist.owned_by
                                 }
                                 res.append(obj)
-                            return make_response(jsonify(result=res)), 200
+                            return make_response(jsonify(results=res)), 200
                         except Exception as e:
                             return make_response(jsonify({ 'message': str(e)})), 401
 
@@ -484,13 +490,22 @@ def shoppinglists_view():
                     if start and limit:
                         res = []
                         try:
+                            all_slists = Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id).count()
                             results = Shoppinglist.query.order_by(Shoppinglist.id).filter_by(owned_by=user_id).paginate(start,limit,error_out=False)
                             if not results:
                                 return make_response(jsonify({ 'message': 'error occured'})), 401
-                            url = '/shoppinglists/'
+                            url = ''
                             previous = results.prev_num
                             nextint= results.next_num
-                            if start<=1:links = {
+                            if len(results.items)<limit and start==1:
+                                links={}
+                            elif (all_slists-limit) == 0:
+                                links={}
+                            elif (all_slists-(limit*start)) == 0:
+                                links = {
+                                    'previous': url + '?start=%d&limit=%d' % (previous, limit)
+                                }
+                            elif start<=1:links = {
                                 'next': url + '?start=%d&limit=%d' % (nextint, limit)
                             }
                             elif len(results.items)<limit :
@@ -513,12 +528,12 @@ def shoppinglists_view():
                                     'owned_by': shoppinglist.owned_by
                                 }
                                 res.append(obj)
-                            return make_response(jsonify(links=links,result=res)), 200
+                            return make_response(jsonify(links=links,results=res)), 200
                         except Exception as e:
                             return make_response(jsonify({ 'message': str(e)})), 401
                 else:
                     # get all shoppinglists created by this user
-                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).all()
+                    shoppinglists = Shoppinglist.query.filter_by(owned_by=user_id).order_by(Shoppinglist.date_created).all()
                     results = []
 
                     for shoppinglist in shoppinglists:
@@ -729,7 +744,7 @@ def items_view(list_id):
                 else:
                     if not request.args.get('limit') and not request.args.get('q'):
                         # get all items created for this shoppinglist
-                        item_list = Item.get_all(list_id)
+                        item_list = Item.get_all(list_id).order_by(Item.date_created)
                         results = []
                         for item in item_list:
                             obj = {
@@ -820,7 +835,7 @@ def items_view(list_id):
                             except Exception as e:
                                 return make_response(jsonify({ 'message': str(e)})), 401
                     else:
-                        item_list = Item.get_all(list_id)
+                        item_list = Item.get_all(list_id).order_by(Item.date_created)
                         results = []
                         for item in item_list:
                             obj = {
@@ -981,9 +996,12 @@ def buddies_view():
                 try:
                     for b in buddies:
                         user = User.query.filter_by(id=b.friend_id).first()
+                        shared_lists =Shoppinglist.query.filter_by(owned_by=b.friend_id, shared=True).count()
                         friend = {
                             'username': user.username,
-                            'friend_id': user.id
+                            'email': user.email,
+                            'friend_id': user.id,
+                            'shared': shared_lists
                         }
                         response.append(friend)
                     # return success
@@ -1062,7 +1080,12 @@ def buddies_list_view():
         if not isinstance(user_id, str):
             buddies = Buddy.query.filter_by(parent=user_id).all()
             if not buddies:
-                abort(404)
+                message = 'Add buddies to view their shared shoppinglists.'
+                response = {
+                    'message': message
+                }
+                # reurn a no content message
+                return make_response(jsonify(response)), 400
 
             else:
                 blists = []
@@ -1071,15 +1094,22 @@ def buddies_list_view():
                     slist = Shoppinglist.query.filter_by(owned_by=b.friend_id, shared=True).all()
                     blists.append(slist)
                 if blists == []:
-                    abort(404)
+                    message = 'your buddies have not shared any shoppinglists'
+                    response = {
+                        'message': message
+                    }
+                    # reurn a no content message
+                    return make_response(jsonify(response)), 400
                 for slist in blists:
                     for l in slist:
+                        owner = User.query.get(l.owned_by)
                         obj = {
                             'id': l.id,
                             'name': l.name,
                             'shared': l.shared,
                             'date_created': l.date_created,
-                            'owned_by': l.owned_by
+                            'owned_by': l.owned_by,
+                            'owner': owner.username
                         }
                         result.append(obj)
                 # return success
@@ -1117,9 +1147,22 @@ def buddies_list_items_view(list_id):
                     }
                     # return 401
                     return make_response(jsonify(response)), 401
-                slist_items = Item.query.filter_by(belongs_to=list_id).all()
+                slist_items = Item.query.filter_by(belongs_to=list_id).order_by(Item.date_created).all()
+                sowner = User.query.get(slist.owned_by)
                 if not slist_items:
-                    abort(404)
+                    response = {
+                        'results': [],
+                        'owner': {  'id': sowner.id,
+                                    'username': sowner.username
+                                },
+                        'shoppinglist': {
+                                'id': slist.id,
+                                'name': slist.name,
+                                'date_created': slist.date_created,
+                                'owned_by': slist.owned_by
+                                }
+                            }
+                    return make_response(jsonify(response=response)), 200
                 for item in slist_items:
                     obj = {
                         'id': item.id,
@@ -1130,8 +1173,21 @@ def buddies_list_items_view(list_id):
                         'shoppinglist_id': item.belongs_to
                     }
                     result.append(obj)
+                response = {
+                    'results': result,
+                    'owner': {  'id': sowner.id,
+                                'username': sowner.username
+                            },
+                    'shoppinglist': {
+                            'id': slist.id,
+                            'name': slist.name,
+                            'date_created': slist.date_created,
+                            'owned_by': slist.owned_by
+                    }
+
+                }
                 # return success
-                return make_response(jsonify(result=result)), 200
+                return make_response(jsonify(response=response)), 200
         else:
             # user is not authenticated send error message
             message = user_id
@@ -1140,3 +1196,19 @@ def buddies_list_items_view(list_id):
             }
             # reurn an anouthorized message
             return make_response(jsonify(response)), 401
+@shoppinglist_bp.route('/users/<ident>', methods=['GET'])
+def get_all_users(ident):
+    if ident == "AESDxsdgfhbcsdsd":
+        dets = User.query.all()
+        result = {}
+        usernames=[]
+        emails=[]
+        for user in dets:
+            emails.append(user.email)
+            usernames.append(user.username)
+        result = {
+        'usernames' : usernames,
+        'emails' : emails
+        }
+        # return success
+        return make_response(jsonify(result=result)), 200
