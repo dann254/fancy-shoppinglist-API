@@ -48,14 +48,14 @@ def register():
                         'message': 'password must be at least 6 characters long'
                     }
                     return make_response(jsonify(response)), 401
-                email_sent=handler(email)
-                if email_sent != "":
-                    pass
-                else:
-                    emails = {
-                        'message': 'email not sent'
-                    }
-                    return make_response(jsonify(emails)), 401
+                # email_sent=handler(email)
+                # if email_sent != "":
+                #     pass
+                # else:
+                #     emails = {
+                #         'message': 'email not sent'
+                #     }
+                #     return make_response(jsonify(emails)), 401
                 user = User(username=username,email=email, password=password)
                 user.save()
 
